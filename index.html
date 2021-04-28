@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <title>CLI</title>
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="https://classless.de/classless.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      <header>
+        <nav>
+          <ul>
+            <li>CLI UI</li>
+            <li><a href="#">Item </a></li>
+            <li>
+              <a href="#">commands ▾</a>
+              <ul>
+                <li><a href="#">cmd 1</a></li>
+                <li><a href="#">cmd 2</a></li>
+              </ul>
+            </li>
+            <li class="float-right">documentation</li>
+          </ul>
+        </nav>
+      </header>
+
+      <main>
+        <div class="row">
+          <div class="col">
+            <div v-for="cmd in commands" :key="cmd.name">
+              <h2>{{ cmd.name }}</h2>
+              <p>{{ cmd.short }}</p>
+              <p>{{ cmd.long }}</p>
+              <pre>
+                <code>{{ cmd.example }}</code>
+              </pre>
+              <div v-if="cmd.flags.length > 0">
+                <h3>flags</h3>
+                <div v-for="opt in cmd.flags" :key="opt.name">
+                  <label for="in_text">{{ opt.name }}
+                    <small>{{ opt.description }}</small>
+                  </label>
+                  <input type="text" :value="opt.value" />          
+                </div>
+
+
+              </div>
+              <div>
+                <pre>
+                  <code>
+                    ./cli {{ cmd.name }}
+                  </code>
+                </pre>
+              </div>
+            </div>
+            
+          </div>
+          <div class="col-2">
+            <p>sidebar</p>
+          </div>
+        </div>
+      </main>
+
+      <footer>&copy; 2021 buzzuti</footer>
+    </div>
+    <script type="application/javascript">
+      var app = new Vue({
+        el: "#app",
+        data() {
+          return {
+            message: "Hello Vue!",
+            commands: [
+              {
+                name: "cmd-one",
+                short: "short description one",
+                long: "loooooooong description with great detail and stuff one",
+                example: "",
+                flags: [
+                  {
+                    naame: "flag 1",
+                    description: "use wisely",
+                    value: ""
+                  },
+                  {
+                    naame: "flag 2",
+                    description: "use real wisely",
+                    value: ""
+                  }
+                ]
+              },
+              {
+                name: "cmd-two",
+                short: "short description two",
+                long: "loooooooong description with great detail and stuff two",
+                example: "",
+                flags: [
+                  {
+                    naame: "flag 1",
+                    description: "use wisely",
+                    value: ""
+                  },
+                  {
+                    naame: "flag 2",
+                    description: "use real wisely",
+                    value: ""
+                  }
+                ]
+              }
+            ]
+          };
+        }
+      });
+    </script>
+  </body>
+</html>
