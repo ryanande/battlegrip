@@ -8,7 +8,7 @@
     <meta name="author" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="stylesheet" href="https://classless.de/classless.css" />
+    <link rel="stylesheet" href="https://classless.de/classless.css" /> 
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   </head>
 
@@ -22,8 +22,7 @@
             <li>
               <a href="#">commands ▾</a>
               <ul>
-                <li><a href="#">cmd 1</a></li>
-                <li><a href="#">cmd 2</a></li>
+                <li v-for="cmd in commands" :key="cmd.name"><a href="#" @click.prevent="goto(cmd.name)">{{ cmd.name }}</a></li>
               </ul>
             </li>
             <li class="float-right">documentation</li>
@@ -35,30 +34,33 @@
         <div class="row">
           <div class="col">
             <div v-for="cmd in commands" :key="cmd.name">
-              <h2>{{ cmd.name }}</h2>
+              <h2 v-bind:id="cmd.name">{{ cmd.name }}</h2>
               <p>{{ cmd.short }}</p>
               <p>{{ cmd.long }}</p>
-              <pre>
+              <pre v-if="cmd.example">
                 <code>{{ cmd.example }}</code>
               </pre>
               <div v-if="cmd.flags.length > 0">
-                <h3>flags</h3>
+                <h3>Flags</h3>
                 <div v-for="opt in cmd.flags" :key="opt.name">
                   <label for="in_text">{{ opt.name }}
                     <small>{{ opt.description }}</small>
                   </label>
                   <input type="text" :value="opt.value" />          
                 </div>
-
-
               </div>
               <div>
                 <pre>
-                  <code>
-                    ./cli {{ cmd.name }}
-                  </code>
+                  <code>{{ commandBuild(cmd) }}</code>
                 </pre>
               </div>
+              <div>
+                <button type="button">copy</button>
+                <button type="button">+ workflow</button>
+                <button type="button">execute</button>
+              </div>
+
+              <hr />
             </div>
             
           </div>
@@ -73,6 +75,22 @@
     <script type="application/javascript">
       var app = new Vue({
         el: "#app",
+        methods: {
+          goto(refName) {
+            const el = document.getElementById(refName);
+            el && el .scrollIntoView({ behavior: 'smooth' });
+          }
+        },
+        computed: {
+          commandBuild(command) {
+            console.log(command);
+            return `./cli ${command.name} ${command.flags
+              .map(function(f) {
+                return !f.value ? "" : "--" + f.name + " '" + f.value + '"';
+              })
+              .join(" ")}`;           
+          }
+        },
         data() {
           return {
             message: "Hello Vue!",
@@ -80,16 +98,16 @@
               {
                 name: "cmd-one",
                 short: "short description one",
-                long: "loooooooong description with great detail and stuff one",
+                long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                 example: "",
                 flags: [
                   {
-                    naame: "flag 1",
+                    name: "flag 1",
                     description: "use wisely",
                     value: ""
                   },
                   {
-                    naame: "flag 2",
+                    name: "flag 2",
                     description: "use real wisely",
                     value: ""
                   }
@@ -98,16 +116,34 @@
               {
                 name: "cmd-two",
                 short: "short description two",
-                long: "loooooooong description with great detail and stuff two",
-                example: "",
+                long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                example: "web go",
                 flags: [
                   {
-                    naame: "flag 1",
+                    name: "flag 1",
                     description: "use wisely",
                     value: ""
                   },
                   {
-                    naame: "flag 2",
+                    name: "flag 2",
+                    description: "use real wisely",
+                    value: ""
+                  }
+                ]
+              },
+              {
+                name: "cmd-three",
+                short: "short description three",
+                long: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
+                example: "web go",
+                flags: [
+                  {
+                    name: "flag 1",
+                    description: "use wisely",
+                    value: ""
+                  },
+                  {
+                    name: "flag 2",
                     description: "use real wisely",
                     value: ""
                   }
