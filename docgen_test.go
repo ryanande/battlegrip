@@ -1,4 +1,4 @@
-package cobraui
+package cobrabattlegrip
 
 import (
 	"reflect"
