@@ -1,13 +1,13 @@
-# Welcome to cobraui 👋
+# Welcome to cobra-battlegrip 👋
 
 ![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000)
 ![Prerequisite](https://img.shields.io/badge/golang-%5E1.16-blue)
-[![License: MIT](https://img.shields.io/github/license/ryanande/cobraui)](https://github.com/ryanande/cobraui/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/github/license/ryanande/cobra-battlegrip)](https://github.com/ryanande/cobra-battlegrip/blob/master/LICENSE)
 [![Twitter: ryanande](https://img.shields.io/twitter/follow/ryanande.svg?style=social)](https://twitter.com/ryanande)
 
 > CLI command that makes magic of your Cobra CLI.
 
-## 🏠 [Homepage](https://github.com/ryanande/cobraui)
+## 🏠 [Homepage](https://github.com/ryanande/cobra-battlegrip)
 
 ### ✨ [Demo](z)
 
@@ -19,7 +19,7 @@
 ## Install
 
 ```sh
-go get https://github.com/ryanande/cobraui
+go get github.com/ryanande/cobra-battlegrip
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ s
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check [issues page](https://github.com/ryanande/cobraui/issues). You can also take a look at the [contributing guide](https://github.com/ryanande/cobraui/blob/master/CONTRIBUTING.md).
+Feel free to check [issues page](https://github.com/ryanande/cobra-battlegrip/issues). You can also take a look at the [contributing guide](https://github.com/ryanande/cobra-battlegrip/blob/master/CONTRIBUTING.md).
 
 ## Show your support
 
@@ -49,4 +49,4 @@ Give a ⭐️ if this project helped you!
 
 Copyright © 2021 [Ryan Anderson](https://github.com/ryanande).
 
-This project is [MIT](https://github.com/ryanande/cobraui/blob/master/LICENSE) licensed.
+This project is [MIT](https://github.com/ryanande/cobra-battlegrip/blob/master/LICENSE) licensed.

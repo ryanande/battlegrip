@@ -70,7 +70,12 @@
                 </pre>
               </div>
               <div>
-                <button type="button" v-on:click="copyCommand(commandBuild(cmd))">copy</button>
+                <button
+                  type="button"
+                  v-on:click="copyCommand(commandBuild(cmd))"
+                >
+                  copy
+                </button>
                 <button type="button">+ workflow</button>
                 <button type="button">execute</button>
               </div>
@@ -96,13 +101,14 @@
           copyCommand(cmd) {
             if (window.clipboardData && window.clipboardData.setData) {
               // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
+              this.toast("copied to clipboard!");
               return window.clipboardData.setData("Text", text);
             } else if (
               document.queryCommandSupported &&
               document.queryCommandSupported("copy")
             ) {
               var textarea = document.createElement("textarea");
-              textarea.textContent = text;
+              textarea.textContent = cmd;
               textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in Microsoft Edge.
               document.body.appendChild(textarea);
               textarea.select();
@@ -113,12 +119,9 @@
                 return false;
               } finally {
                 document.body.removeChild(textarea);
+                this.toast("copied to clipboard!");
               }
             }
-            Toastify({
-              text: "text copied",
-              duration: 3000
-            }).showToast();
           },
           commandBuild(cmd) {
             return `./cli ${cmd.name} ${cmd.flags
@@ -128,6 +131,12 @@
                   : "--" + f.name + ' "' + f.value + '"';
               })
               .join(" ")}`;
+          },
+          toast(text) {
+            Toastify({
+              text: text,
+              duration: 3000
+            }).showToast();
           }
         },
         data() {
@@ -137,8 +146,7 @@
               {
                 name: "cmd-one",
                 short: "short description one",
-                long:
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                 example: "",
                 flags: [
                   {
@@ -156,8 +164,7 @@
               {
                 name: "cmd-two",
                 short: "short description two",
-                long:
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                 example: "web go",
                 flags: [
                   {
@@ -175,8 +182,7 @@
               {
                 name: "cmd-three",
                 short: "short description three",
-                long:
-                  "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
+                long: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
                 example: "web go",
                 flags: [
                   {
