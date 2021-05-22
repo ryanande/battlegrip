@@ -1,4 +1,4 @@
-module github.com/ryanande/cobraui
+module github.com/ryanande/cobra-battlegrip
 
 go 1.16
 
