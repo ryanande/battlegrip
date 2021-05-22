@@ -1,6 +1,7 @@
 package cobrabattlegrip
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,10 +11,12 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
-	"github.com/markbates/pkger"
 	"github.com/pkg/browser"
 	log "github.com/sirupsen/logrus"
 )
+
+//go:embed index.html
+var indexPage []byte
 
 var directoryPath string
 var listeningAddr string
@@ -73,10 +76,11 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/healthcheck", healthHandler).Methods("GET")
 	r.HandleFunc("/commands", cobraCommandHandler).Methods("GET")
 
-	staticFileDirectory := pkger.Dir(directoryPath) 
-	staticFileHandler := http.StripPrefix("/", http.FileServer(staticFileDirectory))
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write(indexPage)
+	})
 
-	r.PathPrefix("/").Handler(staticFileHandler).Methods("GET")
 	return r
 }
 

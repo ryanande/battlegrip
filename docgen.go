@@ -26,7 +26,13 @@ func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 			if err != nil {
 				cfmt.Errorf(err.Error())
 			}
-			data, err := json.Marshal(docs)
+
+			app := ApplicationDetails{
+				AssemblyName: filepath.Base(os.Args[0]),
+				Commands: docs,
+			}
+
+			data, err := json.Marshal(app)
 			if err != nil {
 				cfmt.Error(err)
 			}
@@ -50,6 +56,10 @@ func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 	return cmd
 }
 
+type ApplicationDetails struct {
+	AssemblyName 	string
+	Commands		[]CommandDetail
+}
 // CommandDetail structure contains parent level commands meta data
 type CommandDetail struct {
 	Name 				string		`json:"name"`
