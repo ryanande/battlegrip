@@ -138,12 +138,12 @@
               duration: 3000
             }).showToast();
           },
-          load() {
-            fetch(`http://localhost:8080/commands`)
+          async load() {
+            fetch("http://localhost:8080/commands")
               .then(response => response.json())
               .then(json => {
                 console.log(json);
-                this.commands = json;
+                this.commands = JSON.parse(json);
             });
           }
         },
