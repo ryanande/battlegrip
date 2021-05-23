@@ -30,7 +30,6 @@
         <nav>
           <ul>
             <li>{{ assembly }}</li>
-            <li><a href="#">Item </a></li>
             <li>
               <a href="#">commands ▾</a>
               <ul>
@@ -147,39 +146,13 @@
             }).showToast();
           },
           async load() {
-            this.commands = [
-              {
-                name: "ui",
-                short: "Launch a web based UI tool that uses the CLI",
-                long: "Additional long description here...",
-                examples: "",
-                options: [
-                  {
-                    name: "config",
-                    default: "",
-                    description: "config file (default is $HOME/.cobra.yaml)",
-                    hidden: false,
-                    section: "",
-                    type: "string"
-                  },
-                  {
-                    name: "help",
-                    default: false,
-                    description: "help for ui",
-                    hidden: false,
-                    section: "",
-                    type: "bool"
-                  }
-                ]
-              }
-            ];
             fetch(`http://localhost:8080/commands`)
               .then(response => response.json())
               .then(json => {
                 console.log(json);
                 data = JSON.parse(json);
-                this.assembly = data.AssemblyName;
-                this.commands = data.Commands;
+                this.assembly = data.assemblyname;
+                this.commands = data.commands;
             });
           }
         },
