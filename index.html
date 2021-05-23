@@ -54,8 +54,8 @@
               <pre v-if="cmd.example">
                 <code>{{ cmd.example }}</code>
               </pre>
-              <div v-if="cmd.options.length > 0">
-                <h3>Flags</h3>
+              <div v-if="cmd.options && cmd.options.length > 0">
+                <h3>Options</h3>
                 <div v-for="opt in cmd.options" :key="opt.name">
                   <label for="in_text"
                     >{{ opt.name }}
@@ -124,7 +124,7 @@
             }
           },
           commandBuild(cmd) {
-            return `./cli ${cmd.name} ${cmd.flags
+            return `./cli ${cmd.name} ${cmd.options
               .map(function (f) {
                 return f.value == ""
                   ? ""
