@@ -29,7 +29,7 @@
       <header>
         <nav>
           <ul>
-            <li>CLI UI</li>
+            <li>{{ assembly }}</li>
             <li><a href="#">Item </a></li>
             <li>
               <a href="#">commands ▾</a>
@@ -76,7 +76,12 @@
                 >
                   copy
                 </button>
-                <button type="button">+ workflow</button>
+                <button
+                  type="button"
+                  v-on:click="addToWorkflow(commandBuild(cmd))"
+                >
+                  + workflow
+                </button>
                 <button type="button">execute</button>
               </div>
               <hr />
@@ -123,10 +128,13 @@
               }
             }
           },
+          addToWorkflow(cmd) {
+            console.log(cmd);
+          },
           commandBuild(cmd) {
-            return `./cli ${cmd.name} ${cmd.options
+            return `./${this.assembly} ${cmd.name} ${cmd.options
               .map(function (f) {
-                return f.value == ""
+                return !f.value || f.value == ""
                   ? ""
                   : "--" + f.name + ' "' + f.value + '"';
               })
@@ -139,11 +147,39 @@
             }).showToast();
           },
           async load() {
-            fetch("http://localhost:8080/commands")
+            this.commands = [
+              {
+                name: "ui",
+                short: "Launch a web based UI tool that uses the CLI",
+                long: "Additional long description here...",
+                examples: "",
+                options: [
+                  {
+                    name: "config",
+                    default: "",
+                    description: "config file (default is $HOME/.cobra.yaml)",
+                    hidden: false,
+                    section: "",
+                    type: "string"
+                  },
+                  {
+                    name: "help",
+                    default: false,
+                    description: "help for ui",
+                    hidden: false,
+                    section: "",
+                    type: "bool"
+                  }
+                ]
+              }
+            ];
+            fetch(`http://localhost:8080/commands`)
               .then(response => response.json())
               .then(json => {
                 console.log(json);
-                this.commands = JSON.parse(json);
+                data = JSON.parse(json);
+                this.assembly = data.AssemblyName;
+                this.commands = data.Commands;
             });
           }
         },
@@ -152,7 +188,7 @@
         },
         data() {
           return {
-            message: "Hello Vue!",
+            assembly: "cli",
             commands: []
           };
         }
