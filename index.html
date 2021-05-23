@@ -54,12 +54,12 @@
               <pre v-if="cmd.example">
                 <code>{{ cmd.example }}</code>
               </pre>
-              <div v-if="cmd.flags.length > 0">
+              <div v-if="cmd.options.length > 0">
                 <h3>Flags</h3>
-                <div v-for="opt in cmd.flags" :key="opt.name">
+                <div v-for="opt in cmd.options" :key="opt.name">
                   <label for="in_text"
                     >{{ opt.name }}
-                    <small>{{ opt.description }}</small>
+                    <small>({{ opt.type }}) {{ opt.description }}</small>
                   </label>
                   <input type="text" v-model="opt.value" />
                 </div>
