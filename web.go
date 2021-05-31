@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/codegangsta/negroni"
@@ -63,8 +65,13 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 		_, _ = resp.Write([]byte(err.Error()))
 	}
 
+	app := ApplicationDetails{
+		AssemblyName: filepath.Base(os.Args[0]),
+		Commands: cmds,
+	}
+
 	resp.Header().Add("content-type", "application/json")
-	jsonByteData, err := json.Marshal(cmds)
+	jsonByteData, err := json.Marshal(app)
 	if err != nil {
 		_, _ = resp.Write([]byte(err.Error()))
 	}
@@ -101,4 +108,3 @@ func WebLogger(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc)
 		}).Info(req.Method + " " + req.URL.Path)
 	}()
 }
-

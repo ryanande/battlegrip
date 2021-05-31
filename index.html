@@ -150,9 +150,8 @@
               .then(response => response.json())
               .then(json => {
                 console.log(json);
-                const data = JSON.parse(json);
-                this.assembly = data.assemblyname;
-                this.commands = data.commands;
+                this.assembly = json.AssemblyName;
+                this.commands = json.Commands;
             });
           }
         },
