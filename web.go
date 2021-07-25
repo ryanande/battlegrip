@@ -67,7 +67,7 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 
 	app := ApplicationDetails{
 		AssemblyName: filepath.Base(os.Args[0]),
-		Commands: cmds,
+		Command: *cmds,
 	}
 
 	resp.Header().Add("content-type", "application/json")

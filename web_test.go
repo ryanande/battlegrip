@@ -7,13 +7,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-func TestCommandEndpoint(t *testing.T)  {
+func TestCommandEndpoint(t *testing.T) {
 
 	rootCmd := &cobra.Command{
 		Use:   "pcs",
 		Short: "pcs cli tool.",
-		Long: `Wheel Snipe Celey!`,
+		Long:  `Wheel Snipe Celey!`,
 	}
 
 	rootCmd.Execute()
@@ -23,14 +22,13 @@ func TestCommandEndpoint(t *testing.T)  {
 		Short: "Launch a web based UI tool that uses the CLI",
 		Long:  `Additional long description here...`,
 		Run: func(cmd *cobra.Command, args []string) {
-		  
-	  
-		  err := Serve(cmd)
-		  if err != nil {
-			  fmt.Errorf("%v", err)
-		  }
-		},
-	  }
 
-	  uiCmd.ExecuteC()
+			err := Serve(cmd)
+			if err != nil {
+				fmt.Print(err.Error())
+			}
+		},
+	}
+
+	uiCmd.ExecuteC()
 }
