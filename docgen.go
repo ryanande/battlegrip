@@ -178,7 +178,6 @@ func createOptionDescriptions(cmd *cobra.Command) (OptionDescriptions, error) {
 
 // ConvertToJSON converts all the commandline options of the given command to JSON.
 func GetCommandDetails(cmd *cobra.Command) (*CommandDetail, error) {
-
 	var destinationCommand CommandDetail
 	descriptions, err := createOptionDescriptions(cmd)
 	if err != nil {

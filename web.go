@@ -22,8 +22,8 @@ var indexPage []byte
 
 var (
 	directoryPath string
-	siteURL           string
-	sitePort          string
+	siteURL       string
+	sitePort      string
 	rootCommand   *cobra.Command
 )
 
@@ -65,7 +65,6 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
-
 	cmds, err := GetCommandDetails(rootCommand)
 	if err != nil {
 		log.Error(err)

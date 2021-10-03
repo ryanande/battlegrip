@@ -13,6 +13,9 @@ WHITE  := $(shell tput -Txterm setaf 7)
 CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
+FAIL_ON_STDOUT := awk '{ print } END { if (NR > 0) { exit 1 } }'
+FILES     := $$(find .$$($(PACKAGE_DIRECTORIES)) -name "*.go")
+
 .PHONY: all test build vendor
 
 all: help
@@ -66,6 +69,10 @@ endif
 lint-go: ## Use golintci-lint on your project
 	$(eval OUTPUT_OPTIONS = $(shell [ "${EXPORT_RESULT}" == "true" ] && echo "--out-format checkstyle ./... | tee /dev/tty > checkstyle-report.xml" || echo "" ))
 	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:latest-alpine golangci-lint run --deadline=65s $(OUTPUT_OPTIONS)
+
+fmt:
+	@echo "gofmt (simplify)"
+	@gofmt -s -l -w $(FILES) 2>&1 | $(FAIL_ON_STDOUT)
 
 ## Docker:
 docker-build: ## Use the dockerfile to build the container

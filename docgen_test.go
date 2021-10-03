@@ -11,7 +11,6 @@ import (
 )
 
 func TestConvertflagtypeReturnsRightType(t *testing.T) {
-
 	type test struct {
 		input    string
 		expected string
@@ -37,7 +36,6 @@ func TestConvertflagtypeReturnsRightType(t *testing.T) {
 			assert.Equal(t, tc.expected, actual, "expected '%v', got '%v'", tc.expected, actual)
 		})
 	}
-
 }
 
 func TestCreateOptionDescription(t *testing.T) {
