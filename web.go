@@ -20,13 +20,17 @@ import (
 //go:embed index.html
 var indexPage []byte
 
-var directoryPath string
-var listeningAddr string
-var rootCommand *cobra.Command
+var (
+	directoryPath string
+	siteURL           string
+	sitePort          string
+	rootCommand   *cobra.Command
+)
 
 func init() {
-    directoryPath = "/web/dist"
-    listeningAddr = ":8080"
+	directoryPath = "/web"
+	siteURL = "localhost"
+	sitePort = "8080"
 }
 
 func Serve(rootCmd *cobra.Command) error {
@@ -35,18 +39,21 @@ func Serve(rootCmd *cobra.Command) error {
 	// that we defined above. The rest of the code stays the same
 	router := newRouter()
 
-    server := negroni.New(
+	server := negroni.New(
 		negroni.NewRecovery(),
 		negroni.HandlerFunc(WebLogger),
 	)
 	server.UseHandler(router)
 
-    log.Infof("Listening on address: %s", listeningAddr)
+	log.Infof("Listening on address: %s", sitePort)
 	log.Infof("Serving Path: %s", directoryPath)
 
-	browser.OpenURL("http://localhost"+listeningAddr)
+	err := browser.OpenURL(fmt.Sprintf("http://%s:%s", siteURL, sitePort))
+	if err != nil {
+		return err
+	}
 
-	err := http.ListenAndServe(listeningAddr, server)
+	err = http.ListenAndServe(sitePort, server)
 	if err != nil {
 		return err
 	}
@@ -67,7 +74,7 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 
 	app := ApplicationDetails{
 		AssemblyName: filepath.Base(os.Args[0]),
-		Command: *cmds,
+		Command:      *cmds,
 	}
 
 	resp.Header().Add("content-type", "application/json")
@@ -85,7 +92,10 @@ func newRouter() *mux.Router {
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		w.Write(indexPage)
+		_, err := w.Write(indexPage)
+		if err != nil {
+			log.Error(err)
+		}
 	})
 
 	return r

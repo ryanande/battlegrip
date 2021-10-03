@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mingrammer/cfmt"
 	"github.com/spf13/pflag"
 
 	"github.com/spf13/cobra"
@@ -21,34 +20,37 @@ func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 		Short:  "Generates CLI docs",
 		Hidden: true, // this in an internal private command
 		Run: func(cmd *cobra.Command, args []string) {
-		
+
 			docs, err := GetCommandDetails(rootCmd)
 			if err != nil {
-				cfmt.Errorf(err.Error())
+				fmt.Printf("%v", err)
 			}
 
 			app := ApplicationDetails{
 				AssemblyName: filepath.Base(os.Args[0]),
-				Command: *docs,
+				Command:      *docs,
 			}
 
 			data, err := json.Marshal(app)
 			if err != nil {
-				cfmt.Error(err)
+				fmt.Printf("%v", err)
 			}
 
 			dir := "web/src/data"
 			if _, err := os.Stat(dir); os.IsNotExist(err) {
-				os.MkdirAll(dir, 0750)
+				err := os.MkdirAll(dir, 0750)
+				if err != nil {
+					fmt.Println("Could not create diretory")
+				}
 			}
 			filename := filepath.Join(dir, "commandData.json")
 			f, err := os.Create(filename)
 			if err != nil {
-				cfmt.Error(err)
+				fmt.Printf("%v", err)
 			}
 			defer f.Close()
 			if _, err := io.WriteString(f, string(data)); err != nil {
-				cfmt.Error(err)
+				fmt.Printf("%v", err)
 			}
 		},
 	}
@@ -57,25 +59,27 @@ func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 }
 
 type ApplicationDetails struct {
-	AssemblyName 	string
-	Command			CommandDetail
+	AssemblyName string
+	Command      CommandDetail
 }
+
 // CommandDetail structure contains parent level commands meta data
 type CommandDetail struct {
-	Name 				string		`json:"name"`
-	IsParent			bool		`json:"isparent"`
-	ShortDescription	string		`json:"short"`
-	LongDescription		string		`json:"long"`
-	Examples			string		`json:"examples"`
-	Options				OptionDescriptions 		`json:"options"`
+	Name             string             `json:"name"`
+	IsParent         bool               `json:"isparent"`
+	ShortDescription string             `json:"short"`
+	LongDescription  string             `json:"long"`
+	Examples         string             `json:"examples"`
+	Options          OptionDescriptions `json:"options"`
 	Commands         []CommandDetail    `json:"commands"`
 }
+
 // OptionDescriptions contains the descriptions for all commandline options of a command.
 type OptionDescriptions []OptionDescription
 
 // OptionDescription contains a properties that describe a commandline option.
 type OptionDescription struct {
-	Name        string		`json:"name"`	
+	Name        string      `json:"name"`
 	Default     interface{} `json:"default"`
 	Description string      `json:"description"`
 	Hidden      bool        `json:"hidden"`
@@ -121,7 +125,6 @@ func getDefaultValue(flag *pflag.Flag) (interface{}, error) {
 		if result, err := cf(fs, flag.Name); err == nil {
 			return result, nil
 		} else {
-			cfmt.Error(err)
 			return nil, err
 		}
 	}
@@ -139,11 +142,10 @@ func createOptionDescription(flag *pflag.Flag) (OptionDescription, string, error
 	}
 	defValue, err := getDefaultValue(flag)
 	if err != nil {
-		cfmt.Error(err)
 		return OptionDescription{}, "", err
 	}
 	d := OptionDescription{
-		Name:		name,
+		Name:        name,
 		Default:     defValue,
 		Description: flag.Usage,
 		Section:     section,
@@ -168,7 +170,6 @@ func createOptionDescriptions(cmd *cobra.Command) (OptionDescriptions, error) {
 		result = append(result, d)
 	})
 	if lastErr != nil {
-		cfmt.Error(lastErr)
 		return nil, lastErr
 	}
 
@@ -181,7 +182,7 @@ func GetCommandDetails(cmd *cobra.Command) (*CommandDetail, error) {
 	var destinationCommand CommandDetail
 	descriptions, err := createOptionDescriptions(cmd)
 	if err != nil {
-		cfmt.Error(err)
+		fmt.Printf("%v", err)
 		return nil, err
 	}
 
