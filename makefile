@@ -3,8 +3,6 @@ GOTEST=$(GOCMD) test
 GOVET=$(GOCMD) vet
 BINARY_NAME=battlegrip
 VERSION?=0.0.0
-SERVICE_PORT?=3000
-DOCKER_REGISTRY?= #if set it should finished by /
 EXPORT_RESULT?=false # for CI please set EXPORT_RESULT to true
 
 GREEN  := $(shell tput -Txterm setaf 2)
@@ -13,17 +11,16 @@ WHITE  := $(shell tput -Txterm setaf 7)
 CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
-FAIL_ON_STDOUT := awk '{ print } END { if (NR > 0) { exit 1 } }'
-FILES     := $$(find .$$($(PACKAGE_DIRECTORIES)) -name "*.go")
-
-.PHONY: all test build vendor
+.PHONY: all vendor test build
 
 all: help
 
 ## Build:
 build: ## Build your project and put the output binary in out/bin/
-	mkdir -p out/bin
-	GO111MODULE=on $(GOCMD) build -mod vendor -o out/bin/$(BINARY_NAME) .
+	GO111MODULE=on $(GOCMD) build -mod vendor 
+
+# mkdir -p out/bin
+#-o out/bin/$(BINARY_NAME) .
 
 clean: ## Remove build related file
 	rm -fr ./bin
@@ -32,10 +29,6 @@ clean: ## Remove build related file
 
 vendor: ## Copy of all packages needed to support builds and tests in the vendor directory
 	$(GOCMD) mod vendor
-
-watch: ## Run the code with cosmtrek/air to have automatic reload on changes
-	$(eval PACKAGE_NAME=$(shell head -n 1 go.mod | cut -d ' ' -f2))
-	docker run -it --rm -w /go/src/$(PACKAGE_NAME) -v $(shell pwd):/go/src/$(PACKAGE_NAME) -p $(SERVICE_PORT):$(SERVICE_PORT) cosmtrek/air
 
 ## Test:
 test: ## Run the tests of the project
@@ -55,35 +48,18 @@ ifeq ($(EXPORT_RESULT), true)
 endif
 
 ## Lint:
-lint: lint-go lint-dockerfile  ## Run all available linters
-
-lint-dockerfile: ## Lint your Dockerfile
-# If dockerfile is present we lint it.
-ifeq ($(shell test -e ./Dockerfile && echo -n yes),yes)
-	$(eval CONFIG_OPTION = $(shell [ -e $(shell pwd)/.hadolint.yaml ] && echo "-v $(shell pwd)/.hadolint.yaml:/root/.config/hadolint.yaml" || echo "" ))
-	$(eval OUTPUT_OPTIONS = $(shell [ "${EXPORT_RESULT}" == "true" ] && echo "--format checkstyle" || echo "" ))
-	$(eval OUTPUT_FILE = $(shell [ "${EXPORT_RESULT}" == "true" ] && echo "| tee /dev/tty > checkstyle-report.xml" || echo "" ))
-	docker run --rm -i $(CONFIG_OPTION) hadolint/hadolint hadolint $(OUTPUT_OPTIONS) - < ./Dockerfile $(OUTPUT_FILE)
-endif
+lint: lint-go lint-yaml ## Run all available linters
 
 lint-go: ## Use golintci-lint on your project
 	$(eval OUTPUT_OPTIONS = $(shell [ "${EXPORT_RESULT}" == "true" ] && echo "--out-format checkstyle ./... | tee /dev/tty > checkstyle-report.xml" || echo "" ))
 	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:latest-alpine golangci-lint run --deadline=65s $(OUTPUT_OPTIONS)
 
-fmt:
-	@echo "gofmt (simplify)"
-	@gofmt -s -l -w $(FILES) 2>&1 | $(FAIL_ON_STDOUT)
-
-## Docker:
-docker-build: ## Use the dockerfile to build the container
-	docker build --rm --tag $(BINARY_NAME) .
-
-docker-release: ## Release the container with tag latest and version
-	docker tag $(BINARY_NAME) $(DOCKER_REGISTRY)$(BINARY_NAME):latest
-	docker tag $(BINARY_NAME) $(DOCKER_REGISTRY)$(BINARY_NAME):$(VERSION)
-	# Push the docker images
-	docker push $(DOCKER_REGISTRY)$(BINARY_NAME):latest
-	docker push $(DOCKER_REGISTRY)$(BINARY_NAME):$(VERSION)
+lint-yaml: ## Use yamllint on the yaml file of your projects
+ifeq ($(EXPORT_RESULT), true)
+	GO111MODULE=off go get -u github.com/thomaspoignant/yamllint-checkstyle
+	$(eval OUTPUT_OPTIONS = | tee /dev/tty | yamllint-checkstyle > yamllint-checkstyle.xml)
+endif
+	docker run --rm -it -v $(shell pwd):/data cytopia/yamllint -f parsable $(shell git ls-files '*.yml' '*.yaml') $(OUTPUT_OPTIONS)
 
 ## Help:
 help: ## Show this help.
