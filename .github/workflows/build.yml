@@ -1,0 +1,22 @@
+name: basic build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2 # Checkout the repository content to github runner.
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v2.1.4
+        with:
+          go-version: '1.17.0' # The Go version to download (if necessary) and use.
+
+      - name: Install dependencies
+        run: make vendor
+
+      - name: Execute the build
+        run: make build
