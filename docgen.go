@@ -13,9 +13,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewDocs generates the CLI documentation in markdown
+// NewJsonDocs is a utility cobra command which generates the CLI documentation in json format
 func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:    "jsondocs",
 		Short:  "Generates CLI docs",
 		Hidden: true, // this in an internal private command
@@ -54,8 +54,6 @@ func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 			}
 		},
 	}
-
-	return cmd
 }
 
 type ApplicationDetails struct {
@@ -176,7 +174,7 @@ func createOptionDescriptions(cmd *cobra.Command) (OptionDescriptions, error) {
 	return result, nil
 }
 
-// ConvertToJSON converts all the commandline options of the given command to JSON.
+// GetCommandDetails gathers all details about a command
 func GetCommandDetails(cmd *cobra.Command) (*CommandDetail, error) {
 	var destinationCommand CommandDetail
 	descriptions, err := createOptionDescriptions(cmd)

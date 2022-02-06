@@ -22,15 +22,13 @@ var indexPage []byte
 
 var (
 	directoryPath string
-	siteURL       string
-	sitePort      string
+	listeningAddr string
 	rootCommand   *cobra.Command
 )
 
 func init() {
 	directoryPath = "/web"
-	siteURL = "localhost"
-	sitePort = "8080"
+    listeningAddr = ":8080"
 }
 
 func Serve(rootCmd *cobra.Command) error {
@@ -41,19 +39,19 @@ func Serve(rootCmd *cobra.Command) error {
 
 	server := negroni.New(
 		negroni.NewRecovery(),
-		negroni.HandlerFunc(WebLogger),
+		negroni.HandlerFunc(webLogger),
 	)
 	server.UseHandler(router)
 
-	log.Infof("Listening on address: %s", sitePort)
+    log.Infof("Listening on address: %s", listeningAddr)
 	log.Infof("Serving Path: %s", directoryPath)
 
-	err := browser.OpenURL(fmt.Sprintf("http://%s:%s", siteURL, sitePort))
+	err := browser.OpenURL("http://localhost"+listeningAddr)
 	if err != nil {
 		return err
 	}
 
-	err = http.ListenAndServe(sitePort, server)
+	err = http.ListenAndServe(listeningAddr, server)
 	if err != nil {
 		return err
 	}
@@ -84,10 +82,21 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(jsonByteData)
 }
 
+func cobraRootCommandHandler(resp http.ResponseWriter, req *http.Request) {
+	
+	resp.Header().Add("content-type", "application/json")
+	jsonByteData, err := json.Marshal(rootCommand.Commands())
+	if err != nil {
+		_, _ = resp.Write([]byte(err.Error()))
+	}
+	_, _ = resp.Write(jsonByteData)
+}
+
 func newRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/healthcheck", healthHandler).Methods("GET")
 	r.HandleFunc("/commands", cobraCommandHandler).Methods("GET")
+	r.HandleFunc("/root", cobraRootCommandHandler).Methods("GET")
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
@@ -100,7 +109,7 @@ func newRouter() *mux.Router {
 	return r
 }
 
-func WebLogger(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func webLogger(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	start := time.Now()
 	next(rw, req)
 	res := rw.(negroni.ResponseWriter)

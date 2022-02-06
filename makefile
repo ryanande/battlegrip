@@ -1,74 +1,104 @@
-GOCMD=go
-GOTEST=$(GOCMD) test
-GOVET=$(GOCMD) vet
-BINARY_NAME=battlegrip
-VERSION?=0.0.0
-EXPORT_RESULT?=false # for CI please set EXPORT_RESULT to true
+.PHONY: default help
+	
+default: help
+help: ## help: display make targets
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m make %-20s -> %s\n\033[0m", $$1, $$2}'
+	
+# make: app info
+APP_NAME    := battlegrip
+APP_WORKDIR := $(shell pwd)
+CLIENT_ID   ?= bogus.account
+APP_LOG_FMT := `/bin/date "+%Y-%m-%d %H:%M:%S %z [$(APP_NAME)]"`
+	
+# make: go info
+GO_COV_DIR  := $(APP_WORKDIR)/coverage
+GO_UNIT_DIR := $(GO_COV_DIR)/unit
+GO_INT_DIR := $(GO_COV_DIR)/integration
+GO_PACKAGES := $(shell go list -f '{{.Dir}}' ./...)
+	
+# make: go test info
+GO_UNIT_JUNIT     := $(GO_UNIT_DIR)/junit.xml
+GO_UNIT_WEBPAGE   := $(GO_UNIT_DIR)/index.html
+GO_UNIT_REPORT    := $(GO_UNIT_DIR)/report.out
+GO_UNIT_COVERAGE  := $(GO_UNIT_DIR)/coverage.out
+GO_UNIT_COBERTURA := $(GO_UNIT_DIR)/cobertura.xml
+	
+GO_INT_JUNIT     := $(GO_INT_DIR)/junit.xml
+GO_INT_WEBPAGE   := $(GO_INT_DIR)/index.html
+GO_INT_REPORT    := $(GO_INT_DIR)/report.out
+GO_INT_COVERAGE  := $(GO_INT_DIR)/coverage.out
+GO_INT_COBERTURA := $(GO_INT_DIR)/cobertura.xml
 
-GREEN  := $(shell tput -Txterm setaf 2)
-YELLOW := $(shell tput -Txterm setaf 3)
-WHITE  := $(shell tput -Txterm setaf 7)
-CYAN   := $(shell tput -Txterm setaf 6)
-RESET  := $(shell tput -Txterm sgr0)
+	
+# --------------------------------------------------
+# Build Targets
+# --------------------------------------------------
+.PHONY: vendor
+vendor:
+	@go mod vendor 
+# --------------------------------------------------
+# Build Targets
+# --------------------------------------------------
+.PHONY: build
+build:
+	@go build . 
+# --------------------------------------------------
+# Test Targets
+# --------------------------------------------------
+.PHONY: test-clean
+test-clean: ## test: clean workspace
+	@rm -rf $(GO_COV_DIR)
 
-.PHONY: all vendor test build
 
-all: help
-
-## Build:
-build: ## Build your project and put the output binary in out/bin/
-	GO111MODULE=on $(GOCMD) build -mod vendor 
-
-# mkdir -p out/bin
-#-o out/bin/$(BINARY_NAME) .
-
-clean: ## Remove build related file
-	rm -fr ./bin
-	rm -fr ./out
-	rm -f ./junit-report.xml checkstyle-report.xml ./coverage.xml ./profile.cov yamllint-checkstyle.xml
-
-vendor: ## Copy of all packages needed to support builds and tests in the vendor directory
-	$(GOCMD) mod vendor
-
-## Test:
-test: ## Run the tests of the project
-ifeq ($(EXPORT_RESULT), true)
-	GO111MODULE=off go get -u github.com/jstemmer/go-junit-report
-	$(eval OUTPUT_OPTIONS = | tee /dev/tty | go-junit-report -set-exit-code > junit-report.xml)
-endif
-	$(GOTEST) -v -race ./... $(OUTPUT_OPTIONS)
-
-coverage: ## Run the tests of the project and export the coverage
-	$(GOTEST) -cover -covermode=count -coverprofile=profile.cov ./...
-	$(GOCMD) tool cover -func profile.cov
-ifeq ($(EXPORT_RESULT), true)
-	GO111MODULE=off go get -u github.com/AlekSi/gocov-xml
-	GO111MODULE=off go get -u github.com/axw/gocov/gocov
-	gocov convert profile.cov | gocov-xml > coverage.xml
-endif
-
-## Lint:
-lint: lint-go lint-yaml ## Run all available linters
-
-lint-go: ## Use golintci-lint on your project
-	$(eval OUTPUT_OPTIONS = $(shell [ "${EXPORT_RESULT}" == "true" ] && echo "--out-format checkstyle ./... | tee /dev/tty > checkstyle-report.xml" || echo "" ))
-	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:latest-alpine golangci-lint run --deadline=65s $(OUTPUT_OPTIONS)
-
-lint-yaml: ## Use yamllint on the yaml file of your projects
-ifeq ($(EXPORT_RESULT), true)
-	GO111MODULE=off go get -u github.com/thomaspoignant/yamllint-checkstyle
-	$(eval OUTPUT_OPTIONS = | tee /dev/tty | yamllint-checkstyle > yamllint-checkstyle.xml)
-endif
-	docker run --rm -it -v $(shell pwd):/data cytopia/yamllint -f parsable $(shell git ls-files '*.yml' '*.yaml') $(OUTPUT_OPTIONS)
-
-## Help:
-help: ## Show this help.
-	@echo ''
-	@echo 'Usage:'
-	@echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
-	@echo ''
-	@echo 'Targets:'
-	@awk 'BEGIN {FS = ":.*?## "} { \
-		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    ${YELLOW}%-20s${GREEN}%s${RESET}\n", $$1, $$2} \
-		else if (/^## .*$$/) {printf "  ${CYAN}%s${RESET}\n", substr($$1,4)} \
-		}' $(MAKEFILE_LIST)
+.PHONY: lint-go
+lint-go: ## lint: lints golang and tries to automatically fix things
+	@echo $(APP_LOG_FMT) "linting and trying to fix things automatically"
+	@golangci-lint run --fix -v --timeout 3m
+	
+.PHONY: _test_variables
+_test_variables:
+	@echo $(APP_LOG_FMT) "installing test dependencies"
+	@go install golang.org/x/lint/golint@latest
+	@go install github.com/jstemmer/go-junit-report@latest
+	@go install github.com/t-yuki/gocover-cobertura@latest
+	@echo $(APP_LOG_FMT) "verifying required variables are set"
+# ifeq ($(CLIENT_SECRET),)
+# 	@echo $(APP_LOG_FMT) "error: CLIENT_SECRET is required"
+# 	@exit 1
+# endif
+	
+.PHONY: test-unit
+test-unit: _test_variables ## test: run unit tests
+	@echo $(APP_LOG_FMT) "running unit test suite"
+	@mkdir -p $(GO_UNIT_DIR)
+	@go test -v \
+	-covermode=atomic \
+	-coverprofile=$(GO_UNIT_COVERAGE) \
+	$(GO_PACKAGES) \
+	2>&1 > $(GO_UNIT_REPORT) || cat $(GO_UNIT_REPORT)
+	@cat $(GO_UNIT_REPORT)
+	@go tool cover -func=$(GO_UNIT_COVERAGE)
+	@go tool cover -html=$(GO_UNIT_COVERAGE) -o $(GO_UNIT_WEBPAGE)
+	@cat $(GO_UNIT_REPORT) | go-junit-report > $(GO_UNIT_JUNIT)
+	@gocover-cobertura < $(GO_UNIT_COVERAGE) > $(GO_UNIT_COBERTURA)
+	
+.PHONY: test-integration
+test-integration: _test_variables ## test: run integration tests
+	@echo $(APP_LOG_FMT) "running integration test suite"
+	@mkdir -p $(GO_INT_DIR)
+	@CLIENT_ID=$(CLIENT_ID) go test -v \
+	-tags=integration \
+	-covermode=atomic \
+	-coverprofile=$(GO_INT_COVERAGE) \
+	$(GO_PACKAGES) \
+	2>&1 > $(GO_INT_REPORT) || cat $(GO_INT_REPORT)
+	@cat $(GO_INT_REPORT)
+	@go tool cover -func=$(GO_INT_COVERAGE)
+	@go tool cover -html=$(GO_INT_COVERAGE) -o $(GO_INT_WEBPAGE)
+	@cat $(GO_INT_REPORT) | go-junit-report > $(GO_INT_JUNIT)
+	@gocover-cobertura < $(GO_INT_COVERAGE) > $(GO_INT_COBERTURA)
+	
+.PHONY: test-acceptance
+test-acceptance: lint-go test-unit test-integration ## test: run acceptance tests
+	

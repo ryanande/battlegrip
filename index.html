@@ -75,13 +75,6 @@
                 >
                   copy
                 </button>
-                <button
-                  type="button"
-                  v-on:click="addToWorkflow(commandBuild(cmd))"
-                >
-                  + workflow
-                </button>
-                <button type="button">execute</button>
               </div>
               <hr />
             </div>
@@ -97,6 +90,12 @@
     <script type="application/javascript">
       var app = new Vue({
         el: "#app",
+        data() {
+          return {
+            assembly: "cli",
+            commands: []
+          };
+        },
         methods: {
           goto(refName) {
             const el = document.getElementById(refName);
@@ -127,9 +126,6 @@
               }
             }
           },
-          addToWorkflow(cmd) {
-            console.log(cmd);
-          },
           commandBuild(cmd) {
             return `./${this.assembly} ${cmd.name} ${cmd.options
               .map(function (f) {
@@ -147,22 +143,16 @@
           },
           async load() {
             fetch(`http://localhost:8080/commands`)
-              .then(response => response.json())
-              .then(json => {
+              .then((response) => response.json())
+              .then((json) => {
                 console.log(json);
                 this.assembly = json.AssemblyName;
-                this.commands = json.Commands;
-            });
+                this.commands = json.Command.commands;
+              });
           }
         },
         created() {
           this.load();
-        },
-        data() {
-          return {
-            assembly: "cli",
-            commands: []
-          };
         }
       });
     </script>
