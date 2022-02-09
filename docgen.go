@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewJsonDocs is a utility cobra command which generates the CLI documentation in json format
+// NewJsonDocs is a utility cobra command which generates the CLI documentation in json format.
 func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 	return &cobra.Command{
 		Use:    "jsondocs",
@@ -61,7 +61,7 @@ type ApplicationDetails struct {
 	Command      CommandDetail
 }
 
-// CommandDetail structure contains parent level commands meta data
+// CommandDetail structure contains parent level commands meta data.
 type CommandDetail struct {
 	Name             string             `json:"name"`
 	IsParent         bool               `json:"isparent"`
@@ -174,7 +174,7 @@ func createOptionDescriptions(cmd *cobra.Command) (OptionDescriptions, error) {
 	return result, nil
 }
 
-// GetCommandDetails gathers all details about a command
+// GetCommandDetails gathers all details about a command.
 func GetCommandDetails(cmd *cobra.Command) (*CommandDetail, error) {
 	var destinationCommand CommandDetail
 	descriptions, err := createOptionDescriptions(cmd)
