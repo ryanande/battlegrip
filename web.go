@@ -28,7 +28,7 @@ var (
 
 func init() {
 	directoryPath = "/web"
-    listeningAddr = ":8080"
+	listeningAddr = ":8080"
 }
 
 func Serve(rootCmd *cobra.Command) error {
@@ -43,10 +43,10 @@ func Serve(rootCmd *cobra.Command) error {
 	)
 	server.UseHandler(router)
 
-    log.Infof("Listening on address: %s", listeningAddr)
+	log.Infof("Listening on address: %s", listeningAddr)
 	log.Infof("Serving Path: %s", directoryPath)
 
-	err := browser.OpenURL("http://localhost"+listeningAddr)
+	err := browser.OpenURL("http://localhost" + listeningAddr)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 }
 
 func cobraRootCommandHandler(resp http.ResponseWriter, req *http.Request) {
-	
+
 	resp.Header().Add("content-type", "application/json")
 	jsonByteData, err := json.Marshal(rootCommand.Commands())
 	if err != nil {
