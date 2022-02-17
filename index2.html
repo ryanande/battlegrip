@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <title>battlegrip</title>
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Styles-->
+    <!-- <link rel="stylesheet" href="https://classless.de/classless.css" /> -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+    />
+    <!-- vueJs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+    <!-- Tostify -->
+    <!-- <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+        />
+        <script
+            type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/toastify-js"
+        ></script> -->
+  </head>
+  <body>
+    <!-- Nav -->
+    <nav class="container-fluid">
+      <ul>
+        <li>
+          <a href="./" class="contrast" onclick="event.preventDefault()"
+            ><strong>battlegrip</strong></a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <a href="#" class="contrast" data-theme-switcher="auto">Auto</a>
+        </li>
+        <li>
+          <a href="#" class="contrast" data-theme-switcher="light">Light</a>
+        </li>
+        <li>
+          <a href="#" class="contrast" data-theme-switcher="dark">Dark</a>
+        </li>
+      </ul>
+    </nav>
+    <!-- ./ Nav -->
+
+    <!-- Main -->
+    <main class="container">
+      <h1 data-bind="text: ApplicationName"></h1>
+      <section
+        data-bind="template: { name: 'command-template', foreach: Commands }"
+      ></section>
+    </main>
+    <!-- ./ Main -->
+
+    <footer class="container-fluid">
+      <small
+        >Built by <span class="secondary">battlegrip</span> •
+        <a href="https://github.com/ryanande/battlegrip/" class="secondary"
+          >source code</a
+        ></small
+      >
+    </footer>
+
+    <script type="text/html" id="command-template">
+      <article>
+        <h3 data-bind="text: name"></h3>
+        <p data-bind="text: short">Short</p>
+        <p data-bind="text: long">Long</p>
+
+        <div data-bind="if: !commands">
+          <p data-bind="if: examples">
+            <code data-bind="text: examples"></code>
+          </p>
+          <form>
+            <fieldset data-bind="foreach: options">
+              <label data-bind="attr: { for: name }">
+                <span data-bind="text: name"></span>
+                <input
+                  type="text"
+                  data-bind="attr: { id: name, name: name, placeholder: name }"
+                  required
+                />
+                <small data-bind="text: description"></small>
+              </label>
+            </fieldset>
+            <p>
+              <code> built command </code>
+            </p>
+            <button type="button">Copy</button>
+          </form>
+        </div>
+        <div
+          data-bind="template: { name: 'command-template', foreach: commands }"
+        ></div>
+      </article>
+    </script>
+
+    <script type="application/javascript">
+      //   function ApplicationDetails(data) {
+      //     this.AssemblyName = data.assemblyname;
+      //     this.Command = data.commands;
+      //   }
+
+      //   function CommandDetail(data) {
+      //     this.Name = data.name;
+      //     this.Use = data.use;
+      //     this.NameAndAliases = data.nameandaliases;
+      //     this.Aliases = data.aliases;
+      //     this.Root = data.root;
+      //     this.ShortDescription = data.short;
+      //     this.LongDescription = data.long;
+      //     this.Examples = data.examples;
+      //     this.Hidden = data.hidden;
+      //     this.IsAvailable = data.isavailable;
+      //     this.HasParent = data.hasparent;
+      //     this.ParentName = data.parentname;
+      //     this.ParentUse = data.parentuse;
+      //     this.Options = data.options;
+      //     this.Commands = data.commands;
+      //   }
+
+      //   function OptionDescription(data) {
+      //     this.Name = data.name;
+      //     this.Default = data.default;
+      //     this.Description = data.description;
+      //     this.Hidden = data.hidden;
+      //     this.Section = data.section;
+      //     this.Type = data.type;
+      //     this.Values = data.values;
+      //   }
+      function CliViewModel() {
+        self = this;
+
+        self.ApplicationName = ko.observable();
+        self.Commands = ko.observableArray([]);
+
+        self.copyCommand = function () {
+          console.log("copyCOmmand");
+        };
+
+        fetch("http://localhost:8080/commands")
+          .then((response) => {
+            return response.json();
+          })
+          .then((myJson) => {
+            console.log(myJson);
+            self.ApplicationName(myJson.AssemblyName);
+            self.Commands(myJson.Command.commands);
+          });
+      }
+      ko.applyBindings(new CliViewModel());
+
+      // Minimal theme switcher
+      const themeSwitcher = {
+        // Config
+        buttonsTarget: "a[data-theme-switcher]",
+        buttonAttribute: "data-theme-switcher",
+        rootAttribute: "data-theme",
+
+        // Init
+        init() {
+          document.querySelectorAll(this.buttonsTarget).forEach(
+            function (button) {
+              button.addEventListener(
+                "click",
+                function (event) {
+                  event.preventDefault();
+                  document
+                    .querySelector("html")
+                    .setAttribute(
+                      this.rootAttribute,
+                      event.target.getAttribute(this.buttonAttribute)
+                    );
+                }.bind(this),
+                false
+              );
+            }.bind(this)
+          );
+        }
+      };
+      // Init
+      themeSwitcher.init();
+    </script>
+  </body>
+</html>

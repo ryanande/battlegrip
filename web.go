@@ -17,7 +17,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//go:embed index.html
+//go:embed index2.html
 var indexPage []byte
 
 var (
@@ -31,8 +31,8 @@ func init() {
 	listeningAddr = ":8080"
 }
 
-func Serve(rootCmd *cobra.Command) error {
-	rootCommand = rootCmd
+func Serve(cmd *cobra.Command) error {
+	rootCommand = cmd
 	// The router is now formed by calling the `newRouter` constructor function
 	// that we defined above. The rest of the code stays the same
 	router := newRouter()

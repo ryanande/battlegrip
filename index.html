@@ -47,36 +47,48 @@
         <div class="row">
           <div class="col">
             <div v-for="cmd in commands" :key="cmd.name">
-              <h2 v-bind:id="cmd.name">{{ cmd.name }}</h2>
-              <p>{{ cmd.short }}</p>
-              <p>{{ cmd.long }}</p>
-              <pre v-if="cmd.example">
-                <code>{{ cmd.example }}</code>
-              </pre>
-              <div v-if="cmd.options && cmd.options.length > 0">
-                <h3>Options</h3>
-                <div v-for="opt in cmd.options" :key="opt.name">
-                  <label for="in_text"
-                    >{{ opt.name }}
-                    <small>({{ opt.type }}) {{ opt.description }}</small>
-                  </label>
-                  <input type="text" v-model="opt.value" />
-                </div>
-              </div>
-              <div>
-                <pre>
-                  <code>{{ commandBuild(cmd) }}</code>
+              <!-- card -->
+              <div class="card info">
+                <p>{{ cmd.name }}</p>
+
+                <h2 v-bind:id="cmd.name">{{ cmd.name }}</h2>
+
+                
+                <p>{{ cmd.short }}</p>
+                <p>{{ cmd.long }}</p>
+
+                <pre v-if="cmd.example">
+                  <code>{{ cmd.example }}</code>
                 </pre>
+
+                <div v-if="cmd.options && cmd.options.length > 0">
+                  <h3>Options</h3>
+                  <div v-for="opt in cmd.options" :key="opt.name">
+                    <label for="in_text"
+                      >{{ opt.name }}
+                      <small>({{ opt.type }}) {{ opt.description }}</small>
+                    </label>
+                    <input type="text" v-model="opt.value" />
+                  </div>
+                </div>
+                
+                <div>
+                  <pre>
+                    <code>{{ commandBuild(cmd) }}</code>
+                  </pre>
+                </div>
+                
+                <div>
+                  <button
+                    type="button"
+                    v-on:click="copyCommand(commandBuild(cmd))"
+                  >
+                    copy
+                  </button>
+                </div>
+
               </div>
-              <div>
-                <button
-                  type="button"
-                  v-on:click="copyCommand(commandBuild(cmd))"
-                >
-                  copy
-                </button>
-              </div>
-              <hr />
+              <!-- /card -->
             </div>
           </div>
           <div class="col-2">
@@ -127,7 +139,7 @@
             }
           },
           commandBuild(cmd) {
-            return `./${this.assembly} ${cmd.name} ${cmd.options
+            return `./${this.assembly} ${cmd.parentuse} ${cmd.use} ${cmd.options
               .map(function (f) {
                 return !f.value || f.value == ""
                   ? ""
@@ -148,6 +160,7 @@
                 console.log(json);
                 this.assembly = json.AssemblyName;
                 this.commands = json.Command.commands;
+                console.log(this.commands);
               });
           }
         },
