@@ -71,9 +71,11 @@
 
     <script type="text/html" id="command-template">
       <article>
-        <h3 data-bind="text: name"></h3>
-        <p data-bind="text: short">Short</p>
-        <p data-bind="text: long">Long</p>
+        <header>
+          <h3 data-bind="text: name"></h3>
+          <p data-bind="text: short">Short</p>
+          <p data-bind="text: long">Long</p>
+        </header>
 
         <div data-bind="if: !commands">
           <p data-bind="if: examples">
@@ -92,9 +94,9 @@
               </label>
             </fieldset>
             <p>
-              <code> built command </code>
+              <code data-bind="text: $root.buildCommandText($root.ApplicationName(), use)"></code>
             </p>
-            <button type="button">Copy</button>
+            <button type="button" data-bind="click: $root.copyCommand">Copy</button>
           </form>
         </div>
         <div
@@ -139,12 +141,18 @@
       function CliViewModel() {
         self = this;
 
-        self.ApplicationName = ko.observable();
+        self.ApplicationName = ko.observable("");
         self.Commands = ko.observableArray([]);
 
         self.copyCommand = function () {
-          console.log("copyCOmmand");
+          console.log("copyCommand");
         };
+
+        self.buildCommandText = function(applicationName, use) {
+          console.log(`use: ${use}`);
+          console.log(`applicationName: ${applicationName}`);
+          return `./${applicationName} ${use} build command`;
+        }
 
         fetch("http://localhost:8080/commands")
           .then((response) => {
