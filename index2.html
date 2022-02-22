@@ -72,72 +72,77 @@
     <script type="text/html" id="command-template">
       <article>
         <header>
-          <h3 data-bind="text: name"></h3>
-          <p data-bind="text: short">Short</p>
-          <p data-bind="text: long">Long</p>
+          <h3 data-bind="text: Name"></h3>
+          <p data-bind="text: ShortDescription">Short</p>
+          <p data-bind="text: LongDescription">Long</p>
         </header>
 
-        <div data-bind="if: !commands">
-          <p data-bind="if: examples">
-            <code data-bind="text: examples"></code>
+        <div data-bind="if: !Commands">
+          <p data-bind="if: Examples">
+            <code data-bind="text: Examples"></code>
           </p>
           <form>
-            <fieldset data-bind="foreach: options">
-              <label data-bind="attr: { for: name }">
-                <span data-bind="text: name"></span>
+            <h5>Flags</h5>
+            <fieldset data-bind="foreach: Options">
+              <label data-bind="attr: { for: Name }">
+                <span data-bind="text: Name"></span>
                 <input
                   type="text"
-                  data-bind="attr: { id: name, name: name, placeholder: name }"
+                  data-bind="attr: { id: Name, name: Name, placeholder: Name, value: Input }"
                   required
                 />
-                <small data-bind="text: description"></small>
+                <small data-bind="text: Description"></small>
               </label>
             </fieldset>
             <p>
-              <code data-bind="text: $root.buildCommandText($root.ApplicationName(), use)"></code>
+              <code data-bind="text: FullCommand($root.ApplicationName())"></code>
             </p>
             <button type="button" data-bind="click: $root.copyCommand">Copy</button>
           </form>
         </div>
         <div
-          data-bind="template: { name: 'command-template', foreach: commands }"
+          data-bind="template: { name: 'command-template', foreach: Commands }"
         ></div>
       </article>
     </script>
 
     <script type="application/javascript">
-      //   function ApplicationDetails(data) {
-      //     this.AssemblyName = data.assemblyname;
-      //     this.Command = data.commands;
-      //   }
 
-      //   function CommandDetail(data) {
-      //     this.Name = data.name;
-      //     this.Use = data.use;
-      //     this.NameAndAliases = data.nameandaliases;
-      //     this.Aliases = data.aliases;
-      //     this.Root = data.root;
-      //     this.ShortDescription = data.short;
-      //     this.LongDescription = data.long;
-      //     this.Examples = data.examples;
-      //     this.Hidden = data.hidden;
-      //     this.IsAvailable = data.isavailable;
-      //     this.HasParent = data.hasparent;
-      //     this.ParentName = data.parentname;
-      //     this.ParentUse = data.parentuse;
-      //     this.Options = data.options;
-      //     this.Commands = data.commands;
-      //   }
+        function CommandDetail(data) {
 
-      //   function OptionDescription(data) {
-      //     this.Name = data.name;
-      //     this.Default = data.default;
-      //     this.Description = data.description;
-      //     this.Hidden = data.hidden;
-      //     this.Section = data.section;
-      //     this.Type = data.type;
-      //     this.Values = data.values;
-      //   }
+          this.Name = data.name;
+          this.Use = data.use;
+          this.NameAndAliases = data.nameandaliases;
+          this.Aliases = data.aliases;
+          this.Root = data.root;
+          this.ShortDescription = data.short;
+          this.LongDescription = data.long;
+          this.Examples = data.examples;
+          this.Hidden = data.hidden;
+          this.IsAvailable = data.isavailable;
+          this.HasParent = data.hasparent;
+          this.ParentName = data.parentname;
+          this.ParentUse = data.parentuse;
+          this.Options = data.options;
+          this.Commands = data.commands;
+          this.Value = ko.observable("");
+
+          this.FullCommand = function(appName) {
+            return "eee"; //`./${appName} ${ParentUse} ${Use} ...`;
+          }
+        }
+
+        function OptionDescription(data) {
+          this.Name = data.name;
+          this.Default = data.default;
+          this.Description = data.description;
+          this.Hidden = data.hidden;
+          this.Section = data.section;
+          this.Type = data.type;
+          this.Values = data.values;
+          this.Input = ko.observable("");
+        }
+
       function CliViewModel() {
         self = this;
 
@@ -148,10 +153,9 @@
           console.log("copyCommand");
         };
 
-        self.buildCommandText = function(applicationName, use) {
-          console.log(`use: ${use}`);
-          console.log(`applicationName: ${applicationName}`);
-          return `./${applicationName} ${use} build command`;
+        self.buildCommandText = function(applicationName, command) {
+          console.log(command);
+          return `./${applicationName} ${command.parentuse} ${command.use}`;
         }
 
         fetch("http://localhost:8080/commands")
@@ -161,8 +165,30 @@
           .then((myJson) => {
             console.log(myJson);
             self.ApplicationName(myJson.AssemblyName);
-            self.Commands(myJson.Command.commands);
+
+            var cmds = myJson.Command.commands.map(function(item) {
+              return mapCommand(item);
+            });
+            console.log(cmds);
+            self.Commands(cmds);
           });
+
+          function mapCommand(item) {
+            let commandDetail = new CommandDetail(item)  
+
+            if (item.commands && item.commands.length > 0) {
+              commandDetail.Commands = item.commands.map(function(cmd){
+                return mapCommand(cmd);
+              });
+            }
+
+            if (item.options.length > 0) {
+              commandDetail.Options = item.options.map(function(opt){
+                return new OptionDescription(opt);
+              });
+            }
+            return commandDetail;
+          }
       }
       ko.applyBindings(new CliViewModel());
 
