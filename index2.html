@@ -9,23 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Styles-->
-    <!-- <link rel="stylesheet" href="https://classless.de/classless.css" /> -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
     />
-    <!-- vueJs -->
+    <!-- knockout -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
-    <!-- Tostify -->
-    <!-- <link
-            rel="stylesheet"
-            type="text/css"
-            href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-        />
-        <script
-            type="text/javascript"
-            src="https://cdn.jsdelivr.net/npm/toastify-js"
-        ></script> -->
   </head>
   <body>
     <!-- Nav -->
@@ -38,14 +27,19 @@
         </li>
       </ul>
       <ul>
+        <li><a href="#">link</a></li>
+        <li><a href="#">link</a></li>
         <li>
-          <a href="#" class="contrast" data-theme-switcher="auto">Auto</a>
-        </li>
-        <li>
-          <a href="#" class="contrast" data-theme-switcher="light">Light</a>
-        </li>
-        <li>
-          <a href="#" class="contrast" data-theme-switcher="dark">Dark</a>
+          <label for="switch">
+            <input
+              type="checkbox"
+              id="switch"
+              name="switch"
+              role="switch"
+              data-bind="click: switchTheme, checked: isDark"
+            />
+            <span data-bind="text: theme"></span>
+          </label>
         </li>
       </ul>
     </nav>
@@ -54,6 +48,13 @@
     <!-- Main -->
     <main class="container">
       <h1 data-bind="text: ApplicationName"></h1>
+      <input
+        type="text"
+        placeholder="Assembly"
+        aria-label="Assembly"
+        data-bind="value: ApplicationName, valueUpdate: 'afterkeyup'"
+      />
+
       <section
         data-bind="template: { name: 'command-template', foreach: Commands }"
       ></section>
@@ -69,6 +70,24 @@
       >
     </footer>
 
+    <!-- Commnad Option Template-->
+    <script type="text/template" id="option-template">
+      <!-- ko if: (Type === 'int' || Type === 'int32' || Type === 'int64') -->
+      <input type="number" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
+      <!-- /ko -->
+      <!-- ko if: Type === 'string' -->
+      <input type="text" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
+      <!-- /ko -->
+      <!-- ko if: Type === 'bool' -->
+      <label data-bind="attr: { for: Name }">
+        <input type="checkbox" data-bind="attr: { name: Name, 'aria-label': Name }, checked: Input" />
+      </label>
+      <!-- /ko -->
+      <small data-bind="text: FormDescription"></small>
+    </script>
+    <!-- /Commnad Option Template-->
+
+    <!-- Commnad Template-->
     <script type="text/html" id="command-template">
       <article>
         <header>
@@ -77,71 +96,96 @@
           <p data-bind="text: LongDescription">Long</p>
         </header>
 
-        <div data-bind="if: !Commands">
+        <div data-bind="if: Commands().length == 0">
           <p data-bind="if: Examples">
             <code data-bind="text: Examples"></code>
           </p>
+
+          <!-- ko if: Options().length > 0 -->
           <form>
-            <h5>Flags</h5>
-            <fieldset data-bind="foreach: Options">
-              <label data-bind="attr: { for: Name }">
-                <span data-bind="text: Name"></span>
-                <input
-                  type="text"
-                  data-bind="attr: { id: Name, name: Name, placeholder: Name, value: Input }"
-                  required
-                />
-                <small data-bind="text: Description"></small>
-              </label>
-            </fieldset>
-            <p>
-              <code data-bind="text: FullCommand($root.ApplicationName())"></code>
-            </p>
-            <button type="button" data-bind="click: $root.copyCommand">Copy</button>
+            <h4>Args</h4>
+            <div
+              data-bind="template: { name: 'option-template', foreach: Options }"
+            ></div>
           </form>
+          <!-- /ko -->
+
+          <p>
+            <code data-bind="text: FullCommand()"></code>
+          </p>
+          <button type="button" data-bind="click: copyToClipboard">Copy</button>
         </div>
         <div
           data-bind="template: { name: 'command-template', foreach: Commands }"
         ></div>
       </article>
     </script>
+    <!-- /Commnad Template-->
 
     <script type="application/javascript">
+      // *** MODEL OBJECTS ****************************
+      function OptionModel(data) {
+        var self = this;
 
-        function CommandDetail(data) {
+        self.Name = data.name;
+        self.Default = data.default;
+        self.Description = data.description;
+        self.Hidden = data.hidden;
+        self.Section = data.section;
+        self.Type = data.type;
+        self.Values = data.values;
+        self.Input = ko.observable(data.default);
 
-          this.Name = data.name;
-          this.Use = data.use;
-          this.NameAndAliases = data.nameandaliases;
-          this.Aliases = data.aliases;
-          this.Root = data.root;
-          this.ShortDescription = data.short;
-          this.LongDescription = data.long;
-          this.Examples = data.examples;
-          this.Hidden = data.hidden;
-          this.IsAvailable = data.isavailable;
-          this.HasParent = data.hasparent;
-          this.ParentName = data.parentname;
-          this.ParentUse = data.parentuse;
-          this.Options = data.options;
-          this.Commands = data.commands;
-          this.Value = ko.observable("");
+        self.FormDescription = ko.pureComputed(function () {
+          return `${self.Name} - ${self.Description} (default: ${self.Default})`;
+        }, this);
+      }
 
-          this.FullCommand = function(appName) {
-            return "eee"; //`./${appName} ${ParentUse} ${Use} ...`;
-          }
-        }
+      function CommandModel(data, appName) {
+        var self = this;
 
-        function OptionDescription(data) {
-          this.Name = data.name;
-          this.Default = data.default;
-          this.Description = data.description;
-          this.Hidden = data.hidden;
-          this.Section = data.section;
-          this.Type = data.type;
-          this.Values = data.values;
-          this.Input = ko.observable("");
-        }
+        self.Name = data.name;
+        self.Use = data.use;
+        self.NameAndAliases = data.nameandaliases;
+        self.Aliases = data.aliases;
+        self.Root = data.root;
+        self.ShortDescription = data.short;
+        self.LongDescription = data.long;
+        self.Examples = data.examples;
+        self.Hidden = data.hidden;
+        self.IsAvailable = data.isavailable;
+        self.HasParent = data.hasparent;
+        self.ParentName = data.parentname;
+        self.ParentUse = data.parentuse;
+
+        self.Options = ko.observableArray(
+          data.options?.map((element, index) => {
+            return new OptionModel(element);
+          })
+        );
+        self.Commands = ko.observableArray(
+          data.commands?.map((element, index) => {
+            return new CommandModel(element, appName);
+          })
+        );
+
+        this.FullCommand = ko.computed(function () {
+          var flags = self.Options().map(function (opt) {
+            if (opt.Input != "") {
+              return `--${opt.Name} "${opt.Input()}"`;
+            }
+          });
+
+          return `./${appName()} ${self.ParentUse} ${self.Use} ${flags.join(" ")}`;
+        }, this);
+
+        self.copyToClipboard = function () {
+          const copy = self.FullCommand();
+          navigator.clipboard.writeText(copy);
+        };
+      }
+
+      // *** MODEL OBJECTS ****************************
 
       function CliViewModel() {
         self = this;
@@ -149,79 +193,34 @@
         self.ApplicationName = ko.observable("");
         self.Commands = ko.observableArray([]);
 
-        self.copyCommand = function () {
-          console.log("copyCommand");
-        };
+        // something is wrong here, or at least on the binding of the checkbox
+        self.theme = ko.observable("light");
+        self.isDark = ko.computed(function () {
+          return self.theme() === "dark";
+        });
 
-        self.buildCommandText = function(applicationName, command) {
-          console.log(command);
-          return `./${applicationName} ${command.parentuse} ${command.use}`;
-        }
+        this.switchTheme = function () {
+          self.theme(self.theme() == "light" ? "dark" : "light");
+          document
+            .getElementsByTagName("html")[0]
+            .setAttribute("data-theme", self.theme());
+        };
 
         fetch("http://localhost:8080/commands")
           .then((response) => {
             return response.json();
           })
           .then((myJson) => {
-            console.log(myJson);
             self.ApplicationName(myJson.AssemblyName);
 
-            var cmds = myJson.Command.commands.map(function(item) {
-              return mapCommand(item);
+            var cmds = myJson.Command.commands.map(function (item) {
+              return new CommandModel(item, self.ApplicationName);
             });
             console.log(cmds);
             self.Commands(cmds);
           });
-
-          function mapCommand(item) {
-            let commandDetail = new CommandDetail(item)  
-
-            if (item.commands && item.commands.length > 0) {
-              commandDetail.Commands = item.commands.map(function(cmd){
-                return mapCommand(cmd);
-              });
-            }
-
-            if (item.options.length > 0) {
-              commandDetail.Options = item.options.map(function(opt){
-                return new OptionDescription(opt);
-              });
-            }
-            return commandDetail;
-          }
       }
       ko.applyBindings(new CliViewModel());
-
-      // Minimal theme switcher
-      const themeSwitcher = {
-        // Config
-        buttonsTarget: "a[data-theme-switcher]",
-        buttonAttribute: "data-theme-switcher",
-        rootAttribute: "data-theme",
-
-        // Init
-        init() {
-          document.querySelectorAll(this.buttonsTarget).forEach(
-            function (button) {
-              button.addEventListener(
-                "click",
-                function (event) {
-                  event.preventDefault();
-                  document
-                    .querySelector("html")
-                    .setAttribute(
-                      this.rootAttribute,
-                      event.target.getAttribute(this.buttonAttribute)
-                    );
-                }.bind(this),
-                false
-              );
-            }.bind(this)
-          );
-        }
-      };
-      // Init
-      themeSwitcher.init();
     </script>
   </body>
 </html>
