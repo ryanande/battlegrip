@@ -4,7 +4,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta charset="utf-8" />
     <title>battlegrip</title>
-    <meta name="description" content="" />
+    <meta name="description" content="battlegrip is a plugin command for Cobra which enables for faster command creation via a web based UI." />
     <meta name="author" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -27,8 +27,6 @@
         </li>
       </ul>
       <ul>
-        <li><a href="#">link</a></li>
-        <li><a href="#">link</a></li>
         <li>
           <label for="switch">
             <input
@@ -43,7 +41,7 @@
         </li>
       </ul>
     </nav>
-    <!-- ./ Nav -->
+    <!-- / Nav -->
 
     <!-- Main -->
     <main class="container">
@@ -59,8 +57,9 @@
         data-bind="template: { name: 'command-template', foreach: Commands }"
       ></section>
     </main>
-    <!-- ./ Main -->
+    <!-- / Main -->
 
+    <!-- Footer -->
     <footer class="container-fluid">
       <small
         >Built by <span class="secondary">battlegrip</span> •
@@ -69,8 +68,9 @@
         ></small
       >
     </footer>
+    <!-- /Footer -->
 
-    <!-- Commnad Option Template-->
+    <!-- Commnad Option TEMPLATE-->
     <script type="text/template" id="option-template">
       <!-- ko if: (Type === 'int' || Type === 'int32' || Type === 'int64') -->
       <input type="number" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
@@ -85,9 +85,9 @@
       <!-- /ko -->
       <small data-bind="text: FormDescription"></small>
     </script>
-    <!-- /Commnad Option Template-->
+    <!-- /Commnad Option TEMPLATE-->
 
-    <!-- Commnad Template-->
+    <!-- Commnad TEMPLATE-->
     <script type="text/html" id="command-template">
       <article>
         <header>
@@ -120,7 +120,7 @@
         ></div>
       </article>
     </script>
-    <!-- /Commnad Template-->
+    <!-- /Commnad TEMPLATE-->
 
     <script type="application/javascript">
       // *** MODEL OBJECTS ****************************
@@ -184,10 +184,10 @@
           navigator.clipboard.writeText(copy);
         };
       }
+      // ***/ MODEL OBJECTS ****************************
 
-      // *** MODEL OBJECTS ****************************
-
-      function CliViewModel() {
+      // ***/ Chrome ViewModel ****************************
+      function ChromeViewModel() {
         self = this;
 
         self.ApplicationName = ko.observable("");
@@ -220,7 +220,7 @@
             self.Commands(cmds);
           });
       }
-      ko.applyBindings(new CliViewModel());
+      ko.applyBindings(new ChromeViewModel());
     </script>
   </body>
 </html>
