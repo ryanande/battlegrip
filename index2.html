@@ -28,16 +28,9 @@
       </ul>
       <ul>
         <li>
-          <label for="switch">
-            <input
-              type="checkbox"
-              id="switch"
-              name="switch"
-              role="switch"
-              data-bind="click: switchTheme, checked: isDark"
-            />
-            <span data-bind="text: theme"></span>
-          </label>
+          <a href="https://github.com/ryanande/battlegrip">
+            <img width="30px" height="30px" src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg"></img>
+          </a>
         </li>
       </ul>
     </nav>
@@ -45,14 +38,23 @@
 
     <!-- Main -->
     <main class="container">
-      <h1 data-bind="text: ApplicationName"></h1>
-      <input
-        type="text"
-        placeholder="Assembly"
-        aria-label="Assembly"
-        data-bind="value: ApplicationName, valueUpdate: 'afterkeyup'"
-      />
-
+      <div class="grid">
+        <div>
+          <h1 data-bind="text: ApplicationName"></h1>
+        </div>
+        <div>
+          <label for="Assembly">
+            Assembly Name
+            <input
+              type="text"
+              placeholder="Assembly"
+              aria-label="Assembly"
+              data-bind="value: ApplicationName, valueUpdate: 'afterkeyup'"
+            />
+          </label>
+        </div>
+      </div>
+      
       <section
         data-bind="template: { name: 'command-template', foreach: Commands }"
       ></section>
@@ -61,29 +63,35 @@
 
     <!-- Footer -->
     <footer class="container-fluid">
-      <small
-        >Built by <span class="secondary">battlegrip</span> •
-        <a href="https://github.com/ryanande/battlegrip/" class="secondary"
-          >source code</a
-        ></small
-      >
+      <small>
+        built by <span class="secondary">battlegrip</span> / 
+        <img width="30px" height="30px" src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg"></img>
+        <a href="https://github.com/ryanande/battlegrip" class="secondary">
+          repo </a> / 
+          code licensed <a href="https://github.com/ryanande/battlegrip/blob/main/LICENSE" class="secondary">MIT</a> 
+      </small>
     </footer>
     <!-- /Footer -->
 
     <!-- Commnad Option TEMPLATE-->
     <script type="text/template" id="option-template">
-      <!-- ko if: (Type === 'int' || Type === 'int32' || Type === 'int64') -->
-      <input type="number" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
-      <!-- /ko -->
-      <!-- ko if: Type === 'string' -->
-      <input type="text" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
-      <!-- /ko -->
-      <!-- ko if: Type === 'bool' -->
       <label data-bind="attr: { for: Name }">
+        <span data-bind="text: Name"></span>
+        <!-- ko if: (Type === 'int' || Type === 'int32' || Type === 'int64') -->
+        <input type="number" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
+        <!-- /ko -->
+        <!-- ko if: Type === 'string' -->
+        <input type="text" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
+        <!-- /ko -->
+        <!-- ko if: Type === 'bool' -->
+        <br />
         <input type="checkbox" data-bind="attr: { name: Name, 'aria-label': Name }, checked: Input" />
+        <!-- /ko -->
+        <div>
+          <small data-bind="text: FormDescription"></small>
+        </div>
       </label>
-      <!-- /ko -->
-      <small data-bind="text: FormDescription"></small>
+      <hr />
     </script>
     <!-- /Commnad Option TEMPLATE-->
 
@@ -92,15 +100,19 @@
       <article>
         <header>
           <h3 data-bind="text: Name"></h3>
+          <h6>Short Description</h6>
           <p data-bind="text: ShortDescription">Short</p>
+          <h6>Long Description</h6>
           <p data-bind="text: LongDescription">Long</p>
+          <!-- ko if: Examples -->
+          <p>
+            <h6>Examples</h6>
+            <code data-bind="text: Examples"></code>
+          </p>
+          <!-- /ko -->
         </header>
 
         <div data-bind="if: Commands().length == 0">
-          <p data-bind="if: Examples">
-            <code data-bind="text: Examples"></code>
-          </p>
-
           <!-- ko if: Options().length > 0 -->
           <form>
             <h4>Args</h4>
@@ -137,7 +149,7 @@
         self.Input = ko.observable(data.default);
 
         self.FormDescription = ko.pureComputed(function () {
-          return `${self.Name} - ${self.Description} (default: ${self.Default})`;
+          return `${self.Description} (default: ${self.Default})`;
         }, this);
       }
 
@@ -171,7 +183,7 @@
 
         this.FullCommand = ko.computed(function () {
           var flags = self.Options().map(function (opt) {
-            if (opt.Input != "") {
+            if (opt.Input() != "") {
               return `--${opt.Name} "${opt.Input()}"`;
             }
           });
@@ -192,19 +204,6 @@
 
         self.ApplicationName = ko.observable("");
         self.Commands = ko.observableArray([]);
-
-        // something is wrong here, or at least on the binding of the checkbox
-        self.theme = ko.observable("light");
-        self.isDark = ko.computed(function () {
-          return self.theme() === "dark";
-        });
-
-        this.switchTheme = function () {
-          self.theme(self.theme() == "light" ? "dark" : "light");
-          document
-            .getElementsByTagName("html")[0]
-            .setAttribute("data-theme", self.theme());
-        };
 
         fetch("http://localhost:8080/commands")
           .then((response) => {
