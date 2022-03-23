@@ -64,10 +64,18 @@ type ApplicationDetails struct {
 // CommandDetail structure contains parent level commands meta data.
 type CommandDetail struct {
 	Name             string             `json:"name"`
-	IsParent         bool               `json:"isparent"`
+	Use              string             `json:"use"`
+	NameAndAliases   string             `json:"nameandaliases"`
+	Aliases          []string           `json:"aliases"`
+	Root             string             `json:"root"`
 	ShortDescription string             `json:"short"`
 	LongDescription  string             `json:"long"`
 	Examples         string             `json:"examples"`
+	Hidden           bool               `json:"hidden"`
+	IsAvailable      bool               `json:"isavailable"`
+	HasParent        bool               `json:"hasparent"`
+	ParentName       string             `json:"parentname"`
+	ParentUse        string             `json:"parentuse"`
 	Options          OptionDescriptions `json:"options"`
 	Commands         []CommandDetail    `json:"commands"`
 }
@@ -185,11 +193,22 @@ func GetCommandDetails(cmd *cobra.Command) (*CommandDetail, error) {
 
 	destinationCommand = CommandDetail{
 		Name:             cmd.Name(),
-		IsParent:         len(cmd.Commands()) > 0,
+		Use:              cmd.Use,
+		NameAndAliases:   cmd.NameAndAliases(),
+		Aliases:          cmd.Aliases,
+		Root:             cmd.Root().Name(),
 		ShortDescription: cmd.Short,
 		LongDescription:  cmd.Long,
 		Examples:         cmd.Example,
+		Hidden:           cmd.Hidden,
+		IsAvailable:      cmd.IsAvailableCommand(),
+		HasParent:        cmd.HasParent(),
 		Options:          descriptions,
+	}
+
+	if cmd.HasParent() {
+		destinationCommand.ParentName = cmd.Parent().Name()
+		destinationCommand.ParentUse = cmd.Parent().Use
 	}
 
 	for _, c := range cmd.Commands() {
