@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewJsonDocs is a utility cobra command which generates the CLI documentation in json format.
-func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
+// NewJSONDocs is a utility cobra command which generates the CLI documentation in json format.
+func NewJSONDocs(rootCmd *cobra.Command) *cobra.Command {
 	return &cobra.Command{
 		Use:    "jsondocs",
 		Short:  "Generates CLI docs",
@@ -56,6 +56,7 @@ func NewJsonDocs(rootCmd *cobra.Command) *cobra.Command {
 	}
 }
 
+// ApplicationDetails is the primary return object
 type ApplicationDetails struct {
 	AssemblyName string
 	Command      CommandDetail
@@ -130,9 +131,9 @@ func getDefaultValue(flag *pflag.Flag) (interface{}, error) {
 	if found {
 		if result, err := cf(fs, flag.Name); err == nil {
 			return result, nil
-		} else {
-			return nil, err
 		}
+		return nil, nil
+		
 	}
 	return nil, fmt.Errorf("no converter function found for type '%s'", flag.Value.Type())
 }
