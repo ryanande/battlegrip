@@ -1,9 +1,5 @@
 # Welcome to battlegrip
 
-![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000)
-![Prerequisite](https://img.shields.io/badge/golang-%5E1.17-blue)
-[![License: MIT](https://img.shields.io/github/license/ryanande/battlegrip)](https://github.com/ryanande/battlegrip/blob/master/LICENSE)
-
 Battlegrip is a simple companion library to add a little help to your user experience when using [Cobra](https://github.com/spf13/cobra) for Go CLI interactions.
 
 In a nutshell, it streamlines the creation of complex multi-flag commands in a simple web form based UI.
@@ -45,18 +41,11 @@ Where you register your commands, simply register the battlegrip command,
 rootCmd.AddCommand(battlegrip.UICmd) // battlegrip setup
 ```
 
-Now, you can initiate the library just like any other command in oyur CLI with the `ui` command,
+Now, you can initiate the library just like any other command in your CLI with the `ui` command,
 
 ```sh
 ./myassembly ui
 ```
-
-## Author
-
-👤 **Ryan Anderson**
-
-* Twitter: [@ryanande](https://twitter.com/ryanande)
-* Github: [@ryanande](https://github.com/ryanande)
 
 ## 🤝 Contributing
 
