@@ -1,4 +1,4 @@
-# Welcome to battlegrip 👋
+# Welcome to battlegrip
 
 ![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000)
 ![Prerequisite](https://img.shields.io/badge/golang-%5E1.17-blue)
