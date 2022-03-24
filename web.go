@@ -17,8 +17,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//go:embed index2.html
+//go:embed index.html
 var indexPage []byte
+
+//go:embed favicon.ico
+var favIcon []byte
+
+//go:embed favicon.svg
+var favIconSvg []byte
 
 var (
 	directoryPath string
@@ -92,19 +98,42 @@ func cobraRootCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(jsonByteData)
 }
 
+func indexCommandHandler(resp http.ResponseWriter, req *http.Request) {
+	resp.WriteHeader(200)
+	_, err := resp.Write(indexPage)
+	if err != nil {
+		log.Error(err)
+	}
+}
+
+func favIconCommandHandler(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Add("content-type", "image/x-icon")
+	resp.WriteHeader(200)
+	_, err := resp.Write(favIcon)
+	if err != nil {
+		log.Error(err)
+	}
+}
+
+func favIconSvgCommandHandler(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Add("content-type", "image/svg+xml")
+	resp.WriteHeader(200)
+	_, err := resp.Write(favIconSvg)
+	if err != nil {
+		log.Error(err)
+	}
+}
+
 func newRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/healthcheck", healthHandler).Methods("GET")
 	r.HandleFunc("/commands", cobraCommandHandler).Methods("GET")
 	r.HandleFunc("/root", cobraRootCommandHandler).Methods("GET")
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		_, err := w.Write(indexPage)
-		if err != nil {
-			log.Error(err)
-		}
-	})
+	r.HandleFunc("/favicon.ico", favIconCommandHandler)
+	r.HandleFunc("/favicon.svg", favIconSvgCommandHandler)
+
+	r.HandleFunc("/", indexCommandHandler)
 
 	return r
 }
