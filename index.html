@@ -3,171 +3,224 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta charset="utf-8" />
-    <title>CLI</title>
-    <meta name="description" content="" />
+    <title>battlegrip</title>
+    <meta name="description" content="battlegrip is a plugin command for Cobra which enables for faster command creation via a web based UI." />
     <meta name="author" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" sizes="any" href="/favicon.ico">
+
     <!-- Styles-->
-    <link rel="stylesheet" href="https://classless.de/classless.css" />
-    <!-- vueJs -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-    <!-- Tostify -->
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-    />
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/toastify-js"
-    ></script>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <!-- knockout -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
   </head>
-
   <body>
-    <div id="app">
-      <header>
-        <nav>
-          <ul>
-            <li>{{ assembly }}</li>
-            <li>
-              <a href="#">commands ▾</a>
-              <ul>
-                <li v-for="cmd in commands" :key="cmd.name">
-                  <a href="#" @click.prevent="goto(cmd.name)">{{ cmd.name }}</a>
-                </li>
-              </ul>
-            </li>
-            <li class="float-right">documentation</li>
-          </ul>
-        </nav>
-      </header>
+    <!-- Nav -->
+    <nav class="container-fluid">
+      <ul>
+        <li>
+          <img width="30px" height="30px" src="favicon.svg"></img>
+          <a href="./" class="contrast" onclick="event.preventDefault()"
+            ><strong>battlegrip</strong></a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <a href="https://github.com/ryanande/battlegrip">
+            <img width="30px" height="30px" src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg"></img>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- / Nav -->
 
-      <main>
-        <div class="row">
-          <div class="col">
-            <div v-for="cmd in commands" :key="cmd.name">
-              <!-- card -->
-              <div class="card info">
-                <p>{{ cmd.name }}</p>
-
-                <h2 v-bind:id="cmd.name">{{ cmd.name }}</h2>
-
-                
-                <p>{{ cmd.short }}</p>
-                <p>{{ cmd.long }}</p>
-
-                <pre v-if="cmd.example">
-                  <code>{{ cmd.example }}</code>
-                </pre>
-
-                <div v-if="cmd.options && cmd.options.length > 0">
-                  <h3>Options</h3>
-                  <div v-for="opt in cmd.options" :key="opt.name">
-                    <label for="in_text"
-                      >{{ opt.name }}
-                      <small>({{ opt.type }}) {{ opt.description }}</small>
-                    </label>
-                    <input type="text" v-model="opt.value" />
-                  </div>
-                </div>
-                
-                <div>
-                  <pre>
-                    <code>{{ commandBuild(cmd) }}</code>
-                  </pre>
-                </div>
-                
-                <div>
-                  <button
-                    type="button"
-                    v-on:click="copyCommand(commandBuild(cmd))"
-                  >
-                    copy
-                  </button>
-                </div>
-
-              </div>
-              <!-- /card -->
-            </div>
-          </div>
-          <div class="col-2">
-            <p>sidebar</p>
-          </div>
+    <!-- Main -->
+    <main class="container">
+      <div class="grid">
+        <div>
+          <h1 data-bind="text: ApplicationName"></h1>
         </div>
-      </main>
+        <div>
+          <label for="Assembly">
+            Assembly Name
+            <input
+              type="text"
+              placeholder="Assembly"
+              aria-label="Assembly"
+              data-bind="value: ApplicationName, valueUpdate: 'afterkeyup'"
+            />
+          </label>
+        </div>
+      </div>
+      
+      <section
+        data-bind="template: { name: 'command-template', foreach: Commands }"
+      ></section>
+    </main>
+    <!-- / Main -->
 
-      <footer>&copy; 2021 buzzuti</footer>
-    </div>
+    <!-- Footer -->
+    <footer class="container-fluid">
+      <small>
+        built by <span class="secondary">battlegrip</span> / 
+        <img width="30px" height="30px" src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg"></img>
+        <a href="https://github.com/ryanande/battlegrip" class="secondary">
+          repo </a> / 
+          code licensed <a href="https://github.com/ryanande/battlegrip/blob/main/LICENSE" class="secondary">MIT</a> 
+      </small>
+    </footer>
+    <!-- /Footer -->
+
+    <!-- Commnad Option TEMPLATE-->
+    <script type="text/template" id="option-template">
+      <label data-bind="attr: { for: Name }">
+        <span data-bind="text: Name"></span>
+        <!-- ko if: (Type === 'int' || Type === 'int32' || Type === 'int64') -->
+        <input type="number" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
+        <!-- /ko -->
+        <!-- ko if: Type === 'string' -->
+        <input type="text" data-bind="attr: { name: Name, placeholder: Name, 'aria-label': Name }, value: Input, valueUpdate: 'afterkeyup'" />
+        <!-- /ko -->
+        <!-- ko if: Type === 'bool' -->
+        <br />
+        <input type="checkbox" data-bind="attr: { name: Name, 'aria-label': Name }, checked: Input" />
+        <!-- /ko -->
+        <div>
+          <small data-bind="text: FormDescription"></small>
+        </div>
+      </label>
+      <hr />
+    </script>
+    <!-- /Commnad Option TEMPLATE-->
+
+    <!-- Commnad TEMPLATE-->
+    <script type="text/html" id="command-template">
+      <article>
+        <header>
+          <h3 data-bind="text: Name"></h3>
+          <h6>Short Description</h6>
+          <p data-bind="text: ShortDescription">Short</p>
+          <h6>Long Description</h6>
+          <p data-bind="text: LongDescription">Long</p>
+          <!-- ko if: Examples -->
+          <p>
+            <h6>Examples</h6>
+            <code data-bind="text: Examples"></code>
+          </p>
+          <!-- /ko -->
+        </header>
+
+        <div data-bind="if: Commands().length == 0">
+          <!-- ko if: Options().length > 0 -->
+          <form>
+            <h4>Args</h4>
+            <div
+              data-bind="template: { name: 'option-template', foreach: Options }"
+            ></div>
+          </form>
+          <!-- /ko -->
+
+          <p>
+            <code data-bind="text: FullCommand()"></code>
+          </p>
+          <button type="button" data-bind="click: copyToClipboard">Copy</button>
+        </div>
+        <div
+          data-bind="template: { name: 'command-template', foreach: Commands }"
+        ></div>
+      </article>
+    </script>
+    <!-- /Commnad TEMPLATE-->
+
     <script type="application/javascript">
-      var app = new Vue({
-        el: "#app",
-        data() {
-          return {
-            assembly: "cli",
-            commands: []
-          };
-        },
-        methods: {
-          goto(refName) {
-            const el = document.getElementById(refName);
-            el && el.scrollIntoView({ behavior: "smooth" });
-          },
-          copyCommand(cmd) {
-            if (window.clipboardData && window.clipboardData.setData) {
-              // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
-              this.toast("copied to clipboard!");
-              return window.clipboardData.setData("Text", text);
-            } else if (
-              document.queryCommandSupported &&
-              document.queryCommandSupported("copy")
-            ) {
-              var textarea = document.createElement("textarea");
-              textarea.textContent = cmd;
-              textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in Microsoft Edge.
-              document.body.appendChild(textarea);
-              textarea.select();
-              try {
-                return document.execCommand("copy"); // Security exception may be thrown by some browsers.
-              } catch (ex) {
-                console.warn("Copy to clipboard failed.", ex);
-                return false;
-              } finally {
-                document.body.removeChild(textarea);
-                this.toast("copied to clipboard!");
-              }
+      // *** MODEL OBJECTS ****************************
+      function OptionModel(data) {
+        var self = this;
+
+        self.Name = data.name;
+        self.Default = data.default;
+        self.Description = data.description;
+        self.Hidden = data.hidden;
+        self.Section = data.section;
+        self.Type = data.type;
+        self.Values = data.values;
+        self.Input = ko.observable(data.default);
+
+        self.FormDescription = ko.pureComputed(function () {
+          return `${self.Description} (default: ${self.Default})`;
+        }, this);
+      }
+
+      function CommandModel(data, appName) {
+        var self = this;
+
+        self.Name = data.name;
+        self.Use = data.use;
+        self.NameAndAliases = data.nameandaliases;
+        self.Aliases = data.aliases;
+        self.Root = data.root;
+        self.ShortDescription = data.short;
+        self.LongDescription = data.long;
+        self.Examples = data.examples;
+        self.Hidden = data.hidden;
+        self.IsAvailable = data.isavailable;
+        self.HasParent = data.hasparent;
+        self.ParentName = data.parentname;
+        self.ParentUse = data.parentuse;
+
+        self.Options = ko.observableArray(
+          data.options?.map((element, index) => {
+            return new OptionModel(element);
+          })
+        );
+        self.Commands = ko.observableArray(
+          data.commands?.map((element, index) => {
+            return new CommandModel(element, appName);
+          })
+        );
+
+        this.FullCommand = ko.computed(function () {
+          var flags = self.Options().map(function (opt) {
+            if (opt.Input() != "") {
+              return `--${opt.Name} "${opt.Input()}"`;
             }
-          },
-          commandBuild(cmd) {
-            return `./${this.assembly} ${cmd.parentuse} ${cmd.use} ${cmd.options
-              .map(function (f) {
-                return !f.value || f.value == ""
-                  ? ""
-                  : "--" + f.name + ' "' + f.value + '"';
-              })
-              .join(" ")}`;
-          },
-          toast(text) {
-            Toastify({
-              text: text,
-              duration: 3000
-            }).showToast();
-          },
-          async load() {
-            fetch(`http://localhost:8080/commands`)
-              .then((response) => response.json())
-              .then((json) => {
-                console.log(json);
-                this.assembly = json.AssemblyName;
-                this.commands = json.Command.commands;
-                console.log(this.commands);
-              });
-          }
-        },
-        created() {
-          this.load();
-        }
-      });
+          });
+
+          return `./${appName()} ${self.ParentUse} ${self.Use} ${flags.join(" ")}`;
+        }, this);
+
+        self.copyToClipboard = function () {
+          const copy = self.FullCommand();
+          navigator.clipboard.writeText(copy);
+        };
+      }
+      // ***/ MODEL OBJECTS ****************************
+
+      // ***/ Chrome ViewModel ****************************
+      function ChromeViewModel() {
+        self = this;
+
+        self.ApplicationName = ko.observable("");
+        self.Commands = ko.observableArray([]);
+
+        fetch("http://localhost:8080/commands")
+          .then((response) => {
+            return response.json();
+          })
+          .then((myJson) => {
+            self.ApplicationName(myJson.AssemblyName);
+
+            var cmds = myJson.Command.commands.map(function (item) {
+              return new CommandModel(item, self.ApplicationName);
+            });
+            console.log(cmds);
+            self.Commands(cmds);
+          });
+      }
+      ko.applyBindings(new ChromeViewModel());
     </script>
   </body>
 </html>
