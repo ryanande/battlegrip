@@ -133,7 +133,7 @@ func getDefaultValue(flag *pflag.Flag) (interface{}, error) {
 			return result, nil
 		}
 		return nil, nil
-		
+
 	}
 	return nil, fmt.Errorf("no converter function found for type '%s'", flag.Value.Type())
 }
