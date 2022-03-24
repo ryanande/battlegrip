@@ -1,6 +1,8 @@
 package battlegrip
 
 import (
+	// embed is required
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
