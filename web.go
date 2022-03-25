@@ -38,7 +38,7 @@ func init() {
 	listeningAddr = ":8080"
 }
 
-// Serve starts up and runs the http server
+// Serve starts up and runs the http server.
 func Serve(cmd *cobra.Command) error {
 	rootCommand = cmd
 	// The router is now formed by calling the `newRouter` constructor function

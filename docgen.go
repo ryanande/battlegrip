@@ -56,7 +56,7 @@ func NewJSONDocs(rootCmd *cobra.Command) *cobra.Command {
 	}
 }
 
-// ApplicationDetails is the primary return object
+// ApplicationDetails is the primary return object.
 type ApplicationDetails struct {
 	AssemblyName string
 	Command      CommandDetail
