@@ -101,8 +101,7 @@ func cobraRootCommandHandler(resp http.ResponseWriter, req *http.Request) {
 
 func indexCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(200)
-	_, err := resp.Write(indexPage)
-	if err != nil {
+	if _, err := resp.Write(indexPage); err != nil {
 		log.Error(err)
 	}
 }
@@ -110,8 +109,7 @@ func indexCommandHandler(resp http.ResponseWriter, req *http.Request) {
 func favIconCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Add("content-type", "image/x-icon")
 	resp.WriteHeader(200)
-	_, err := resp.Write(favIcon)
-	if err != nil {
+	if _, err := resp.Write(favIcon); err != nil {
 		log.Error(err)
 	}
 }
@@ -119,8 +117,7 @@ func favIconCommandHandler(resp http.ResponseWriter, req *http.Request) {
 func favIconSvgCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Add("content-type", "image/svg+xml")
 	resp.WriteHeader(200)
-	_, err := resp.Write(favIconSvg)
-	if err != nil {
+	if _, err := resp.Write(favIconSvg); err != nil {
 		log.Error(err)
 	}
 }

@@ -44,13 +44,13 @@ func NewJSONDocs(rootCmd *cobra.Command) *cobra.Command {
 				}
 			}
 			filename := filepath.Join(dir, "commandData.json")
-			f, err := os.Create(filename)
-			if err != nil {
-				fmt.Printf("%v", err)
+			f, createErr := os.Create(filename)
+			if createErr != nil {
+				fmt.Printf("%v", createErr)
 			}
 			defer f.Close()
-			if _, err := io.WriteString(f, string(data)); err != nil {
-				fmt.Printf("%v", err)
+			if _, writeErr := io.WriteString(f, string(data)); writeErr != nil {
+				fmt.Printf("%v", writeErr)
 			}
 		},
 	}
