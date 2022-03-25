@@ -41,8 +41,7 @@ func init() {
 // Serve starts up and runs the http server.
 func Serve(cmd *cobra.Command) error {
 	rootCommand = cmd
-	// The router is now formed by calling the `newRouter` constructor function
-	// that we defined above. The rest of the code stays the same
+	// The router is now formed by calling `newRouter` defined above.
 	router := newRouter()
 
 	server := negroni.New(
