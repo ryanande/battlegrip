@@ -1,7 +1,7 @@
 package battlegrip
 
 import (
-	// embed is required
+	// embed is required.
 	_ "embed"
 	"encoding/json"
 	"fmt"
@@ -89,16 +89,6 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(jsonByteData)
 }
 
-func cobraRootCommandHandler(resp http.ResponseWriter, req *http.Request) {
-
-	resp.Header().Add("content-type", "application/json")
-	jsonByteData, err := json.Marshal(rootCommand.Commands())
-	if err != nil {
-		_, _ = resp.Write([]byte(err.Error()))
-	}
-	_, _ = resp.Write(jsonByteData)
-}
-
 func indexCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(200)
 	if _, err := resp.Write(indexPage); err != nil {
@@ -126,7 +116,6 @@ func newRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/healthcheck", healthHandler).Methods("GET")
 	r.HandleFunc("/commands", cobraCommandHandler).Methods("GET")
-	r.HandleFunc("/root", cobraRootCommandHandler).Methods("GET")
 
 	r.HandleFunc("/favicon.ico", favIconCommandHandler)
 	r.HandleFunc("/favicon.svg", favIconSvgCommandHandler)
