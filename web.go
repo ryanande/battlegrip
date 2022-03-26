@@ -1,7 +1,7 @@
 package battlegrip
 
 import (
-	// embed is required
+	// embed is required.
 	_ "embed"
 	"encoding/json"
 	"fmt"
@@ -41,8 +41,7 @@ func init() {
 // Serve starts up and runs the http server.
 func Serve(cmd *cobra.Command) error {
 	rootCommand = cmd
-	// The router is now formed by calling the `newRouter` constructor function
-	// that we defined above. The rest of the code stays the same
+	// The router is now formed by calling `newRouter` defined above.
 	router := newRouter()
 
 	server := negroni.New(
@@ -90,20 +89,9 @@ func cobraCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	_, _ = resp.Write(jsonByteData)
 }
 
-func cobraRootCommandHandler(resp http.ResponseWriter, req *http.Request) {
-
-	resp.Header().Add("content-type", "application/json")
-	jsonByteData, err := json.Marshal(rootCommand.Commands())
-	if err != nil {
-		_, _ = resp.Write([]byte(err.Error()))
-	}
-	_, _ = resp.Write(jsonByteData)
-}
-
 func indexCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(200)
-	_, err := resp.Write(indexPage)
-	if err != nil {
+	if _, err := resp.Write(indexPage); err != nil {
 		log.Error(err)
 	}
 }
@@ -111,8 +99,7 @@ func indexCommandHandler(resp http.ResponseWriter, req *http.Request) {
 func favIconCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Add("content-type", "image/x-icon")
 	resp.WriteHeader(200)
-	_, err := resp.Write(favIcon)
-	if err != nil {
+	if _, err := resp.Write(favIcon); err != nil {
 		log.Error(err)
 	}
 }
@@ -120,8 +107,7 @@ func favIconCommandHandler(resp http.ResponseWriter, req *http.Request) {
 func favIconSvgCommandHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Add("content-type", "image/svg+xml")
 	resp.WriteHeader(200)
-	_, err := resp.Write(favIconSvg)
-	if err != nil {
+	if _, err := resp.Write(favIconSvg); err != nil {
 		log.Error(err)
 	}
 }
@@ -130,7 +116,6 @@ func newRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/healthcheck", healthHandler).Methods("GET")
 	r.HandleFunc("/commands", cobraCommandHandler).Methods("GET")
-	r.HandleFunc("/root", cobraRootCommandHandler).Methods("GET")
 
 	r.HandleFunc("/favicon.ico", favIconCommandHandler)
 	r.HandleFunc("/favicon.svg", favIconSvgCommandHandler)

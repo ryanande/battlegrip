@@ -18,7 +18,7 @@ func NewJSONDocs(rootCmd *cobra.Command) *cobra.Command {
 	return &cobra.Command{
 		Use:    "jsondocs",
 		Short:  "Generates CLI docs",
-		Hidden: true, // this in an internal private command
+		Hidden: true, // this in an internal private command.
 		Run: func(cmd *cobra.Command, args []string) {
 
 			docs, err := GetCommandDetails(rootCmd)
@@ -44,13 +44,13 @@ func NewJSONDocs(rootCmd *cobra.Command) *cobra.Command {
 				}
 			}
 			filename := filepath.Join(dir, "commandData.json")
-			f, err := os.Create(filename)
-			if err != nil {
-				fmt.Printf("%v", err)
+			f, createErr := os.Create(filename)
+			if createErr != nil {
+				fmt.Printf("%v", createErr)
 			}
 			defer f.Close()
-			if _, err := io.WriteString(f, string(data)); err != nil {
-				fmt.Printf("%v", err)
+			if _, writeErr := io.WriteString(f, string(data)); writeErr != nil {
+				fmt.Printf("%v", writeErr)
 			}
 		},
 	}
@@ -138,8 +138,7 @@ func getDefaultValue(flag *pflag.Flag) (interface{}, error) {
 	return nil, fmt.Errorf("no converter function found for type '%s'", flag.Value.Type())
 }
 
-// createOptionDescription creates a description for the given flag.
-// Returns description, name, error.
+// createOptionDescription creates a desc for the flags.
 func createOptionDescription(flag *pflag.Flag) (OptionDescription, string, error) {
 	name := flag.Name
 	nameParts := strings.Split(name, ".")
@@ -162,8 +161,7 @@ func createOptionDescription(flag *pflag.Flag) (OptionDescription, string, error
 	return d, name, nil
 }
 
-// CreateOptionDescriptions creates a map of descriptions for all the commandline
-// options of the given command.
+// CreateOptionDescriptions maps descriptions for all commandline options.
 func createOptionDescriptions(cmd *cobra.Command) (OptionDescriptions, error) {
 	result := OptionDescriptions{}
 
@@ -213,7 +211,7 @@ func GetCommandDetails(cmd *cobra.Command) (*CommandDetail, error) {
 	}
 
 	for _, c := range cmd.Commands() {
-		// skipping not available or help topic command
+		// skipping not available or help topic command.
 		if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() {
 			continue
 		}
