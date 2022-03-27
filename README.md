@@ -51,7 +51,7 @@ Now, you can initiate the library just like any other command in your CLI with t
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check [issues page](https://github.com/ryanande/battlegrip/issues). You can also take a look at the [contributing guide](https://github.com/ryanande/battlegrip/blob/master/CONTRIBUTING.md).
+Feel free to check [issues page](https://github.com/ryanande/battlegrip/issues). You can also take a look at the [contributing guide](https://github.com/ryanande/battlegrip/blob/main/.github/CONTRIBUTING.md).
 
 ## Show your support
 
