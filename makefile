@@ -1,5 +1,7 @@
 .PHONY: default help
-	
+
+## this needs to be refactored and cleaned up, way too much going on here
+
 default: help
 help: ## help: display make targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

@@ -1,60 +1,13 @@
 package battlegrip
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/pflag"
 
 	"github.com/spf13/cobra"
 )
-
-// NewJSONDocs is a utility cobra command which generates the CLI documentation in json format.
-func NewJSONDocs(rootCmd *cobra.Command) *cobra.Command {
-	return &cobra.Command{
-		Use:    "jsondocs",
-		Short:  "Generates CLI docs",
-		Hidden: true, // this in an internal private command.
-		Run: func(cmd *cobra.Command, args []string) {
-
-			docs, err := GetCommandDetails(rootCmd)
-			if err != nil {
-				fmt.Printf("%v", err)
-			}
-
-			app := ApplicationDetails{
-				AssemblyName: filepath.Base(os.Args[0]),
-				Command:      *docs,
-			}
-
-			data, err := json.Marshal(app)
-			if err != nil {
-				fmt.Printf("%v", err)
-			}
-
-			dir := "web/src/data"
-			if _, err := os.Stat(dir); os.IsNotExist(err) {
-				err := os.MkdirAll(dir, 0750)
-				if err != nil {
-					fmt.Println("Could not create diretory")
-				}
-			}
-			filename := filepath.Join(dir, "commandData.json")
-			f, createErr := os.Create(filename)
-			if createErr != nil {
-				fmt.Printf("%v", createErr)
-			}
-			defer f.Close()
-			if _, writeErr := io.WriteString(f, string(data)); writeErr != nil {
-				fmt.Printf("%v", writeErr)
-			}
-		},
-	}
-}
 
 // ApplicationDetails is the primary return object.
 type ApplicationDetails struct {

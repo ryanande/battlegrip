@@ -28,13 +28,11 @@ var favIcon []byte
 var favIconSvg []byte
 
 var (
-	directoryPath string
 	listeningAddr string
 	rootCommand   *cobra.Command
 )
 
 func init() {
-	directoryPath = "/web"
 	listeningAddr = ":8080"
 }
 
@@ -51,7 +49,6 @@ func Serve(cmd *cobra.Command) error {
 	server.UseHandler(router)
 
 	log.Infof("Listening on address: %s", listeningAddr)
-	log.Infof("Serving Path: %s", directoryPath)
 
 	err := browser.OpenURL("http://localhost" + listeningAddr)
 	if err != nil {
@@ -117,10 +114,10 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/healthcheck", healthHandler).Methods("GET")
 	r.HandleFunc("/commands", cobraCommandHandler).Methods("GET")
 
-	r.HandleFunc("/favicon.ico", favIconCommandHandler)
-	r.HandleFunc("/favicon.svg", favIconSvgCommandHandler)
+	r.HandleFunc("/favicon.ico", favIconCommandHandler).Methods("GET")
+	r.HandleFunc("/favicon.svg", favIconSvgCommandHandler).Methods("GET")
 
-	r.HandleFunc("/", indexCommandHandler)
+	r.HandleFunc("/", indexCommandHandler).Methods("GET")
 
 	return r
 }
