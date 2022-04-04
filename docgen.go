@@ -70,9 +70,13 @@ var (
 		"intSlice":    func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetIntSlice(name) },
 		"int32":       func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetInt32(name) },
 		"int64":       func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetInt64(name) },
+		"uint32":      func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetUint32(name) },
+		"uint64":      func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetUint64(name) },
 		"string":      func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetString(name) },
 		"stringSlice": func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringSlice(name) },
 		"stringArray": func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringArray(name) },
+		// Hack: Need to learn if this is the best way to address
+		"mapSlice":    func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringSlice(name) },
 	}
 )
 
