@@ -76,7 +76,7 @@ var (
 		"stringSlice": func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringSlice(name) },
 		"stringArray": func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringArray(name) },
 		// Hack: Need to learn if this is the best way to address
-		"mapSlice":    func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringSlice(name) },
+		"mapSlice": func(fs *pflag.FlagSet, name string) (interface{}, error) { return fs.GetStringSlice(name) },
 	}
 )
 
