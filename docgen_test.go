@@ -166,6 +166,26 @@ func TestCreateOptionDescription(t *testing.T) {
 			ExpectedName: "int_2",
 		},
 		{
+			Flag: buildFlag(func(fs *pflag.FlagSet) { fs.Int32("int32_1", 7, "Usage of int32_1") }),
+			Expected: OptionDescription{
+				Name:        "int32_1",
+				Default:     int32(7),
+				Description: "Usage of int32_1",
+				Type:        "int32",
+			},
+			ExpectedName: "int32_1",
+		},
+		{
+			Flag: buildFlag(func(fs *pflag.FlagSet) { fs.Int64("int64_1", 7, "Usage of int64_1") }),
+			Expected: OptionDescription{
+				Name:        "int64_1",
+				Default:     int64(7),
+				Description: "Usage of int64_1",
+				Type:        "int64",
+			},
+			ExpectedName: "int64_1",
+		},
+		{
 			Flag: buildFlag(func(fs *pflag.FlagSet) { fs.IntP("int_3", "x", 3, "Usage of int_3") }),
 			Expected: OptionDescription{
 				Name:        "int_3",
